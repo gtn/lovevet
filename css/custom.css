@@ -1,0 +1,32 @@
+li.example-alert {
+	background-color: #fcf8e3;
+}
+
+li.example-done {
+	background-color: #dff0d8;
+}
+
+.ui-page-theme-a .example-alert .ui-btn, 
+html .ui-bar-a .example-alert .ui-btn, 
+html .ui-body-a .example-alert .ui-btn, 
+html body .ui-group-theme-a .example-alert .ui-btn, 
+.ui-page-theme-a .example-alert .ui-btn:visited, 
+html .ui-bar-a .example-alert .ui-btn:visited, 
+html .ui-body-a .example-alert .ui-btn:visited, 
+html body .ui-group-theme-a .example-alert .ui-btn:visited, 
+html head + body .example-alert .ui-btn.ui-btn-a:visited {
+	background-color: #fcf8e3;
+}
+
+.ui-page-theme-a .example-done .ui-btn, 
+html .ui-bar-a  .ui-btn, 
+html .ui-body-a .example-done .ui-btn, 
+html body .ui-group-theme-a .example-done .ui-btn, 
+html head + body .example-done .ui-btn.ui-btn-a, 
+.ui-page-theme-a .example-done .ui-btn:visited, 
+html .ui-bar-a .example-done .ui-btn:visited, 
+html .ui-body-a .example-done .ui-btn:visited, 
+html body .ui-group-theme-a .example-done .ui-btn:visited, 
+html head + body .example-done .ui-btn.ui-btn-a:visited {
+	background-color: #dff0d8;
+}
