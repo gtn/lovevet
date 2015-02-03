@@ -58,9 +58,9 @@
 					
 					<input name="text-basic" id="text-basic" value="" type="text" placeholder="Name"/>
 					<input name="password" id="password" value="" autocomplete="off" type="password"placeholder="Password"/>
-					<input type = "submit" value = "test login"/>
-					<a href="schueler_examples.php" class="ui-shadow ui-btn ui-corner-all">Login</a>
-					
+					<input type = "submit" value = "Login"/>
+					<!-- <a href="schueler_examples.php" class="ui-shadow ui-btn ui-corner-all">Login</a>
+					 -->
 				</form>
 	
 	
