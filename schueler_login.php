@@ -15,7 +15,8 @@
 		
 		<div class="ui-panel-wrapper">
 			<div class="ui-content" role="main">
-			<?php      
+			<?php     
+			    session_start(); 
 				if(isset($_GET['login']) && $_GET['login']==1){
 					//do login in here
 					if(isset($_POST["text-basic"]) && isset($_POST["password"])){
