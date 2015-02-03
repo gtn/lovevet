@@ -19,10 +19,17 @@
 				if(isset($_GET['login']) && $_GET['login']==1){
 					//do login in here
 					if(isset($_POST["text-basic"]) && isset($_POST["password"])){
-						$url = "http://gtn02.gtn-solutions.com/moodle27/login/token.php?username=".$_POST["text-basic"]."&password=".$_POST["password"]."&service=moodle_mobile_app";
+					    $properties = parse_ini_file("properties.ini");
+						$url = $properties["url"]."login/token.php?username=".$_POST["text-basic"]."&password=".$_POST["password"]."&service=moodle_mobile_app";
 						$json = file_get_contents($url); 
 						$data = json_decode($json);
-						echo $data->{'token'};
+						$mdl_token = $data->{'token'};
+						
+						if(isset($mdl_token)){
+						    $_SESSION['mdl_token'] = $mdl_token;
+						    ?>
+						    <script type="text/javascript"> window.top.location.href="schueler_examples.php"</script>
+						    <?php 						}
 					}
 				}
 			?>
