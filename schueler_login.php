@@ -19,17 +19,37 @@
 				if(isset($_GET['login']) && $_GET['login']==1){
 					//do login in here
 					if(isset($_POST["text-basic"]) && isset($_POST["password"])){
+					    $username = $_POST["text-basic"];
+					    $password = $_POST["password"];
 					    $properties = parse_ini_file("properties.ini");
-						$url = $properties["url"]."login/token.php?username=".$_POST["text-basic"]."&password=".$_POST["password"]."&service=moodle_mobile_app";
+						
+					    //get Moodle token
+					    $url = $properties["url"]."login/token.php?username=".$username."&password=".$password."&service=moodle_mobile_app";
 						$json = file_get_contents($url); 
 						$data = json_decode($json);
 						$mdl_token = $data->{'token'};
 						
-						if(isset($mdl_token)){
+						//get Exacomp token
+						$url = $properties["url"]."login/token.php?username=".$username."&password=".$password."&service=exacompservices";
+						$json = file_get_contents($url);
+						$data = json_decode($json);
+						$exacomp_token = $data->{'token'};
+						
+						//get Exaport token
+						$url = $properties["url"]."login/token.php?username=".$username."&password=".$password."&service=exaportservices";
+						$json = file_get_contents($url);
+						$data = json_decode($json);
+						$exaport_token = $data->{'token'};
+						
+						if(isset($mdl_token) && isset($exacomp_token) && isset($exaport_token)){
 						    $_SESSION['mdl_token'] = $mdl_token;
+						    $_SESSION['exacomp_token'] = $exacomp_token;
+						    $_SESSION['exaport_token'] = $exaport_token;
 						    ?>
 						    <script type="text/javascript"> window.top.location.href="schueler_examples.php"</script>
-						    <?php 						}
+						    <?php 						
+						}
+						
 					}
 				}
 			?>
