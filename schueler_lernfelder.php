@@ -4,6 +4,7 @@
 <head>
 	<title>Lovevet</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
 	<link rel="stylesheet" href="css/custom.css" />
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
@@ -41,12 +42,13 @@
                     $function = "block_exacomp_get_subtopics_by_topic";
                     $params = new stdClass();
                     $params->topicid = $subjectid;
+                    $params->userid = 0;
                     
                     $resp_xml = $curl->get($serverurl.$function, $params);
                     $xml = simplexml_load_string($resp_xml);
                     $json = json_encode($xml);
                     $multiple = json_decode($json,TRUE);
-                 
+                   
                     $topics = array();
                     $current_id = 0;
                     foreach($multiple as $single){
@@ -77,6 +79,7 @@
                         $function = "block_exacomp_get_examples_by_subtopic";
                         $params = new stdClass();
                         $params->subtopicid = $topic->id;
+                        $params->userid = 0;
                         
                         $resp_xml = $curl->get($serverurl.$function, $params);
                         $xml = simplexml_load_string($resp_xml);
