@@ -1,4 +1,6 @@
-
+<?php     
+session_start();
+?>
 <!DOCTYPE html> 
 <html>
 <head>
@@ -19,17 +21,72 @@
 			<div class="ui-header ui-bar-inherit" data-role="header" role="banner">
 				<h1 class="ui-title" role="heading" aria-level="1">Auszubildende</h1>
 				
-				
 			</div>
 		
 			<div class="ui-content" role="main">
 		
+				<?php                       
+				require_once('./curl.php');
+				
+				$exaport_token = $_SESSION['exaport_token'];
+				
+				$curl = new curl;
+				
+				$properties = parse_ini_file("properties.ini");
+				
+				//get courses
+				$serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exaport_token."&wsfunction=";
+				$function = "block_exaport_get_external_trainer_students";
+				$resp_xml = $curl->get($serverurl.$function);
+				 
+				$xml = simplexml_load_string($resp_xml);
+				$json = json_encode($xml);
+				$multiple = json_decode($json,TRUE);
+
+				$students = array();
+				
+				foreach($multiple as $single){
+				    foreach($single as $keys){
+				        foreach($keys as $key=>$value){
+				            //different results from webservice
+				            if(strcmp($key, "KEY")==0){
+				                $student = new stdClass();
+				                
+				                foreach($value as $attribute){
+    				                if(strcmp($attribute["@attributes"]["name"], "name")==0){
+    				                        $student->name = $attribute["VALUE"];
+    				                }
+    				                if(strcmp($attribute["@attributes"]["name"], "userid")==0){
+    				                    $student->id = $attribute["VALUE"];
+    				                }
+				                }
+				                $students[] = $student;
+				                
+				            }else{
+				                foreach($value as $attributes){
+				                    $student = new stdClass();
+				                    
+				                    foreach($attributes as $attribute){
+    				                    if(strcmp($attribute["@attributes"]["name"], "name")==0){
+        				                        $student->name = $attribute["VALUE"];
+        				                }
+        				                if(strcmp($attribute["@attributes"]["name"], "userid")==0){
+        				                    $student->id = $attribute["VALUE"];
+        				                }
+				                    }
+				                    $students[] = $student;
+				                    
+				                }
+				            }
+				        }
+				    }
+				}
+				?>
 				<ul data-role="listview" data-count-theme="b" data-inset="true">
-				    <li><a href="trainer_teilbereich.php">Max Mustermann <span class="ui-li-count">12</span></a></li>
-				    <li><a href="trainer_teilbereich.php">Max Mustermann <span class="ui-li-count">0</span></a></li>
-				    <li><a href="trainer_teilbereich.php">Max Mustermann <span class="ui-li-count">4</span></a></li>
-				    <li><a href="trainer_teilbereich.php">Max Mustermann <span class="ui-li-count">3</span></a></li>
-				    <li><a href="trainer_teilbereich.php">Max Mustermann <span class="ui-li-count">10</span></a></li>
+				    <?php 
+				        foreach($students as $student)
+				            echo '<li><a href="trainer_teilbereich.php?u='.$student->id.'">'.$student->name.' <span class="ui-li-count">0</span></a></li>';
+				    ?>
 				</ul>
 	
 	
