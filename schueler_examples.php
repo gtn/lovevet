@@ -38,12 +38,16 @@
                     //get courses
                     $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
                     $function = "block_exacomp_get_courses";
-                    $resp_xml = $curl->get($serverurl.$function);
+                    
+                    $params = new stdClass();
+                    $params->userid = 0;
+                    
+                    $resp_xml = $curl->get($serverurl.$function, $params);
                    
                     $xml = simplexml_load_string($resp_xml);
                     $json = json_encode($xml);
                     $multiple = json_decode($json,TRUE);
-                    
+                   
                     $courses = array();
                     foreach($multiple as $single){
                         foreach($single as $key){
@@ -151,7 +155,7 @@
                 <ul data-role="listview" data-inset="true" data-divider-theme="a">
                 <?php 
                 foreach($subjects as $subject){
-                    echo "<li><a href='schueler_lernfelder.php'>".$subject->title."</a></li>";
+                    echo "<li><a href='schueler_lernfelder.php?subjectid=".$subject->id."'>".$subject->title."</a></li>";
                 }
                 ?>
                 </ul>
