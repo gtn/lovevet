@@ -157,7 +157,7 @@
                 <ul data-role="listview" data-inset="true" data-divider-theme="a">
                 <?php 
                 foreach($subjects as $subject){
-                    echo "<li><a href='trainer_lernfeld.php?subjectid=".$subject->id."'>".$subject->title."</a></li>";
+                    echo "<li><a href='trainer_lernfeld.php?subjectid=".$subject->id."&u=".$_GET["u"]."'>".$subject->title."</a></li>";
                 }
                 ?>
                 </ul>

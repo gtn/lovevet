@@ -24,7 +24,108 @@
 		
 			<div class="ui-content" role="main">
 
+			<?php 
+                require_once('./curl.php');
+                
+                session_start();
+                $exacomp_token = $_SESSION['exacomp_token'];
+              
+                //echo $exacomp_token;
+                if(isset($exacomp_token) && isset($_GET['subjectid'])){
+                    $subjectid = $_GET['subjectid'];
+                    $curl = new curl;
+                    
+                    $properties = parse_ini_file("properties.ini");		
+                    $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
+                    
+                    //get topics
+                    $function = "block_exacomp_get_subtopics_by_topic";
+                    $params = new stdClass();
+                    $params->topicid = $subjectid;
+                    $params->userid = $_GET['u'];
+                    
+                    $resp_xml = $curl->get($serverurl.$function, $params);
+                    $xml = simplexml_load_string($resp_xml);
+                    $json = json_encode($xml);
+                    $multiple = json_decode($json,TRUE);
+                   
+                    $topics = array();
+                    $current_id = 0;
+                    foreach($multiple as $single){
+                        foreach($single as $keys){
+                            foreach($keys as $key){
+                                foreach($key as $attributes){
+                                    foreach($attributes as $attribute){
+                                        if(strcmp($attribute["@attributes"]["name"], "subtopicid")==0){
+                                            if(!in_array($attribute["VALUE"], $topics)){
+                                                $topics[$attribute["VALUE"]] = new stdClass();
+                                                $topics[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                $topics[$attribute["VALUE"]]->examples = array();
+                                                $current_id = $attribute["VALUE"];
+                                            }
+                                        }else if(strcmp($attribute["@attributes"]["name"], "title")==0){
+                                             if(array_key_exists($current_id, $topics) && $current_id>0){
+                                                 $topics[$current_id]->title = $attribute["VALUE"];
+                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    //get examples
+                    foreach($topics as $topic){
+                        $function = "block_exacomp_get_examples_by_subtopic";
+                        $params = new stdClass();
+                        $params->subtopicid = $topic->id;
+                        $params->userid = 0;
+                        
+                        $resp_xml = $curl->get($serverurl.$function, $params);
+                        $xml = simplexml_load_string($resp_xml);
+                        $json = json_encode($xml);
+                        $multiple = json_decode($json,TRUE);
+                        
+                        $current_id = 0;
+                        foreach($multiple as $single){
+                            foreach($single as $keys){
+                                foreach($keys as $key){
+                                    foreach($key as $attributes){
+                                        foreach($attributes as $attribute){
+                                            if(strcmp($attribute["@attributes"]["name"], "exampleid")==0){
+                                                if(!in_array($attribute["VALUE"], $topics[$topic->id]->examples)){
+                                                    $topics[$topic->id]->examples[$attribute["VALUE"]] = new stdClass();
+                                                    $topics[$topic->id]->examples[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                
+                                                    $current_id = $attribute["VALUE"];
+                                                }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "title")==0){
+                                                 if(array_key_exists($current_id, $topics[$topic->id]->examples) && $current_id>0){
+                                                     $topics[$topic->id]->examples[$current_id]->title = $attribute["VALUE"];
+                                                 }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }   
+                    }
+                    
+                    foreach($topics as $topic){
+                        echo '<div data-role="collapsible">';
+                        echo '<h2>'.$topic->title.'</h2>';
+                        echo '<ul data-role="listview" data-filter="true">';
+                        
+                        foreach($topic->examples as $example){
+                            echo '<li data-icon="eye"><a href="schueler_example.php?exampleid='.$example->id.'">'.$example->title.'</a></li>';
+                        }
+                        echo '</ul>';
+                        echo '</div>';
+                    }
+                }
+                ?>
 	
+	<!--  
 				<div data-role="collapsible">
 				<h2>Installiere eine Badewanne</h2>
 				    <ul data-role="listview" data-filter="true">
@@ -43,7 +144,7 @@
 				    </ul>
 				</div>
 
-				
+	-->
 			</div><!-- /ui-content -->
 			
 		</div><!-- /ui-panel-wrapper -->
