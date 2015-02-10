@@ -29,7 +29,7 @@
                 
                 session_start();
                 $exacomp_token = $_SESSION['exacomp_token'];
-              
+                $exaport_token = $_SESSION['exaport_token'];
                 //echo $exacomp_token;
                 if(isset($exacomp_token) && isset($_GET['subjectid'])){
                     $subjectid = $_GET['subjectid'];
@@ -117,7 +117,34 @@
                         echo '<ul data-role="listview" data-filter="true">';
                         
                         foreach($topic->examples as $example){
-                            echo '<li data-icon="eye"><a href="schueler_example.php?exampleid='.$example->id.'">'.$example->title.'</a></li>';
+                            $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exaport_token."&wsfunction=";
+                    
+                            $function = "block_exaport_get_item_example_status";
+                            $params = new stdClass();
+                            $params->exampleid = $example->id;
+                            
+                            $resp_xml = $curl->get($serverurl.$function, $params);
+                            $xml = simplexml_load_string($resp_xml);
+                            $json = json_encode($xml);
+                            $single = json_decode($json,TRUE);
+                            
+                            $status = 0;
+                            foreach($single as $key){
+                                foreach($key as $attributes){
+                                        foreach($attributes as $attribute){
+                                            if(!is_array($attribute)){
+                                                $status = $attribute;
+                                            }
+                                        }
+                                }
+                            }
+                            
+                            if($status == 0)
+                                echo '<li data-icon="eye"><a href="schueler_example.php?exampleid='.$example->id.'">'.$example->title.' (noch offen)</a></li>';
+                            elseif($status == 1)
+                                echo '<li data-icon="check" class="example-done"><a href="schueler_example.php?exampleid='.$example->id.'">'.$example->title.' (gelöst)</a></li>';
+                            elseif($status == 2)
+                                echo '<li data-icon="alert" class="example-alert"><a href="schueler_example.php?exampleid='.$example->id.'">'.$example->title.' (Abgegeben, Überarbeitung erforderlich)</a></li>';
                         }
                         echo '</ul>';
                         echo '</div>';
