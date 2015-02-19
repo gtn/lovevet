@@ -117,9 +117,9 @@
                         echo '<ul data-role="listview" data-filter="true">';
                         
                         foreach($topic->examples as $example){
-                            $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exaport_token."&wsfunction=";
+                            $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
                     
-                            $function = "block_exaport_get_item_example_status";
+                            $function = "block_exacomp_get_item_example_status";
                             $params = new stdClass();
                             $params->exampleid = $example->id;
                             
