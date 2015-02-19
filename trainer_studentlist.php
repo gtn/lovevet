@@ -28,14 +28,13 @@ session_start();
 				<?php                       
 				require_once('./curl.php');
 				
-				$exaport_token = $_SESSION['exacomp_token'];
-				echo $exaport_token;
+				$exacomp_token = $_SESSION['exacomp_token'];
 				$curl = new curl;
 				
 				$properties = parse_ini_file("properties.ini");
 				
 				//get courses
-				$serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exaport_token."&wsfunction=";
+				$serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
 				//json call: add &moodlewsrestformat=json
 				$function = "block_exacomp_get_external_trainer_students";
 				$resp_xml = $curl->get($serverurl.$function);
