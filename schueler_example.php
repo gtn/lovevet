@@ -106,8 +106,7 @@
 					<label for="slider-fill">Selbsteinsch&auml;tzung:</label>
 					<input name="slider-fill" id="slider-fill" value="<?php echo $student_self_evaluation;?>" min="0" max="100" step="1" data-highlight="true" type="range">
 				 </li>
-				 <li data-role="list-divider">Kompetenzen die diesem Beispiel zugeordnet sind <span class="ui-li-count">3</span></li>
-			     <li>
+				
 					    <?php 
 					        if(isset($exacomp_token) && isset($_GET['exampleid'])){
                                 $example = $_GET['exampleid'];
@@ -146,7 +145,12 @@
                                         }
                                     }
                                 }
-                                if($all)
+								
+								$count = count($descriptors);
+                                echo '<li data-role="list-divider">Kompetenzen die diesem Beispiel zugeordnet sind <span class="ui-li-count">'.$count.'</span></li>';
+			                    echo '<li>';
+                                
+								if($all)
                                     echo '<input name="checkbox-1aa" id="checkbox-1aa" checked="" type="checkbox" disabled="">';
                                 else 
                                     echo '<input name="checkbox-1aa" id="checkbox-1aa" type="checkbox" disabled="">';
