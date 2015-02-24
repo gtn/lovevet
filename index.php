@@ -25,6 +25,26 @@
 				
 				</form>
 	
+	            <?php 
+	            $properties = parse_ini_file("properties.ini");
+	            
+	            //get Exacomp token
+	            $url = $properties["url"]."login/token.php?username=trainer1&password=Trainer1!&service=exacompservices";
+	            $json = file_get_contents($url);
+	            $data = json_decode($json);
+	            $exacomp_token = $data->{'token'};
+	            
+	            require_once('./curl.php');
+	             
+	            $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=block_exacomp_get_user_role";
+	            $xml = simplexml_load_string(file_get_contents($serverurl));
+	            
+	            echo "Beispiel Aufruf fuerr get_user_role (1 = Ausbilder, 0 = Auszubildender): " . $serverurl . "<br/>";
+	            print_r($xml);
+	            
+	            // ROLE 1 == TRAINER
+	            // ROLE 0 == STUDENT
+	            ?>
 		
 			</div><!-- /ui-content -->
 		</div><!-- /ui-panel-wrapper -->
