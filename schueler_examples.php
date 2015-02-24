@@ -36,120 +36,42 @@
                     
                     $properties = parse_ini_file("properties.ini");		
                     
-                    //get courses
+                    //get topics
                     $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
-                    $function = "block_exacomp_get_courses";
+                    $function = "block_exacomp_get_subjects_for_user";
                     
                     $params = new stdClass();
                     $params->userid = 0;
                     
                     $resp_xml = $curl->get($serverurl.$function, $params);
-                   
+                    
                     $xml = simplexml_load_string($resp_xml);
                     $json = json_encode($xml);
-                    $multiple = json_decode($json,TRUE);
-                   
-                    $courses = array();
-                    foreach($multiple as $single){
-                        foreach($single as $key){
-                            //foreach($keys as $key){
-                                foreach($key as $attributes){
-                                    foreach($attributes as $attribute){
-                                        if(strcmp($attribute["@attributes"]["name"], "courseid")==0){
-                                            if(!in_array($attribute["VALUE"], $courses)){
-                                                $courses[$attribute["VALUE"]] = new stdClass();
-                                                $courses[$attribute["VALUE"]]->id = $attribute["VALUE"];
-                                            }
-                                        }
-                                    }
-                                }
-                            //}
-                        }
-                    }
-                 
-                    //get schooltypes
-                    $function = "block_exacomp_get_subjects";
+                    $multiple = json_decode($json, TRUE);
                     
-                    foreach($courses as $course){
-                       $courses[$course->id]->schooltypes = array();
-                       
-                       $params = new stdClass();
-                       $params->courseid = $course->id;
-                        
-                       $resp_xml = $curl->post($serverurl.$function, $params);
-                   
-                       $xml = simplexml_load_string($resp_xml);
-                       $json = json_encode($xml);
-                       $multiple = json_decode($json,TRUE);
-                         
-                       foreach($multiple as $single){
-                            foreach($single as $keys){
-                                foreach($keys as $key=>$value){
-                                    //different results from webservice
-                                    if(strcmp($key, "KEY")==0){
-                                        foreach($value as $attribute){
-                                                if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
-                                                    if(!in_array($attribute["VALUE"], $courses[$course->id]->schooltypes)){
-                                                        $courses[$course->id]->schooltypes[] = $attribute["VALUE"];
-                                                    }
-                                                }
-                                            }
-                                    }else{
-                                        foreach($value as $attributes){
-                                            foreach($attributes as $attribute){
-                                                if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
-                                                    if(!in_array($attribute["VALUE"], $courses[$course->id]->schooltypes)){
-                                                        $courses[$course->id]->schooltypes[] = $attribute["VALUE"];
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    //get subjects
-                    $function = "block_exacomp_get_topics";
                     $subjects = array();
-                   
-                    foreach($courses as $course){
-                        foreach($course->schooltypes as $schooltype){
-                           $params = new stdClass();
-                           $params->subjectid = $schooltype;
-                           $params->courseid = $course->id;
-                 
-                           $resp_xml = $curl->post($serverurl.$function, $params);
-                           
-                           $xml = simplexml_load_string($resp_xml);
-                           $json = json_encode($xml);
-                           $multiple = json_decode($json,TRUE);
-             
-                           $current_id = 0;
-                           foreach($multiple as $single){
-                                foreach($single as $keys){
-                                    //foreach($keys as $key){
-                                        foreach($keys as $attributes){
-                                            foreach($attributes as $attribute){
-                                                if(strcmp($attribute["@attributes"]["name"], "topicid")==0){
-                                                    if(!array_key_exists($attribute["VALUE"], $subjects)){
-                                                        $subjects[$attribute["VALUE"]] = new stdClass();
-                                                        $subjects[$attribute["VALUE"]]->id = $attribute["VALUE"];
-                                                        $current_id = $attribute["VALUE"];
-                                                    }
-                                                }else if(strcmp($attribute["@attributes"]["name"], "title")==0){
-                                                     if(array_key_exists($current_id, $subjects) && $current_id>0){
-                                                         $subjects[$current_id]->title = $attribute["VALUE"];
-                                                     }
-                                                }
-                                            }
-                                        }
-                                    //}
-                                }
-                            }
-                        }
-                    }
+                    $current_id = 0;
+                    foreach($multiple as $single){
+                         foreach($single as $keys){
+                             //foreach($keys as $key){
+                                 foreach($keys as $attributes){
+                                     foreach($attributes as $attribute){
+                                         if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
+                                             if(!array_key_exists($attribute["VALUE"], $subjects)){
+                                                 $subjects[$attribute["VALUE"]] = new stdClass();
+                                                 $subjects[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                 $current_id = $attribute["VALUE"];
+                                             }
+                                         }else if(strcmp($attribute["@attributes"]["name"], "title")==0){
+                                              if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                  $subjects[$current_id]->title = $attribute["VALUE"];
+                                              }
+                                         }
+                                     }
+                                 }
+                            //}
+                         }
+                     }
                     
                 }
                 ?>
