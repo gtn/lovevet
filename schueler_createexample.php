@@ -33,95 +33,144 @@
                 $exaport_token = $_SESSION['exaport_token'];
                 //echo $exacomp_token;
                 if(isset($exacomp_token)){
+                    (isset($_GET['save'])&& $_GET['save']==1)?$save=1:$save=0;
                     $curl = new curl;
-                    
+                        
                     $properties = parse_ini_file("properties.ini");		
                     $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
-                    
-                    //get topics
-                    $function = "block_exacomp_get_competencies_for_upload";
-                    $params = new stdClass();
-                    $params->userid = 0;
-                    
-                    $resp_xml = $curl->get($serverurl.$function, $params);
-                   
-                    $xml = simplexml_load_string($resp_xml);
-                    $json = json_encode($xml);
-                    $multiple = json_decode($json,TRUE);
-                   
-                    $subjects = array();
-                    $current_id = 0;
-                    foreach($multiple as $single){
-                        foreach($single as $key){
-                            //foreach($keys as $key){
-                                foreach($key as $attributes){
-                                    foreach($attributes as $attribute){
-                                        if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
-                                            if(!in_array($attribute["VALUE"], $subjects)){
-                                                $subjects[$attribute["VALUE"]] = new stdClass();
-                                                $subjects[$attribute["VALUE"]]->id = $attribute["VALUE"];
-                                                $subjects[$attribute["VALUE"]]->topics = array();
-                                                $current_id = $attribute["VALUE"];
-                                            }
-                                        }else if(strcmp($attribute["@attributes"]["name"], "subjecttitle")==0){
-                                             if(array_key_exists($current_id, $subjects) && $current_id>0){
-                                                 $subjects[$current_id]->title = $attribute["VALUE"];
-                                             }
-                                        }else if(strcmp($attribute["@attributes"]["name"], "topics")==0){
-                                            if(array_key_exists($current_id, $subjects) && $current_id>0){
-                                                 $subjects[$current_id]->topics_multiple = $attribute["MULTIPLE"];
-                                             }
-                                        }
+                        
+                    if($save == 1){
+                        //name, description & competencies for example
+                        if(isset($_POST['name']) && isset($_POST['description']) && isset($_POST['comps_select'])){
+                            $name = $_POST['name'];
+                            $description = $_POST['description'];
+                            $comps_array = $_POST['comps_select'];
+                            $task = $_POST['task'];
+                            
+                            $comps = "";
+                            foreach($comps_array as $id){
+                                $comps .= $id.",";
+                            }
+                            $comps = substr($comps, 0, strlen($comps)-1);
+                            
+                            $function = "block_exacomp_create_example";
+                            $params = new stdClass();
+                            $params->name = $name;
+                            $params->description = $description;
+                            $params->task = $task;
+                            $params->comps = $comps;
+
+                            $resp_xml = $curl->get($serverurl.$function, $params);
+                            $xml = simplexml_load_string($resp_xml);
+                            $json = json_encode($xml);
+                            $single = json_decode($json,TRUE);
+                            
+                            foreach($single as $key){
+                                foreach($key as $attribute){
+                                   if(strcmp($attribute["@attributes"]["name"], "exampleid")==0){
+                                        $id = $attribute["VALUE"];
                                     }
                                 }
-                            //}
+                            }
+                           
+                            //example wurde erstellt, auf example seite weiterleiten?
+                            echo '<script type="text/javascript">
+           							window.location = "schueler_example.php?exampleid='.$id.'&courseid=0"
+      							  </script>';
                         }
-                    }
-                    
-                    foreach($subjects as $subject){
-                        foreach($subject->topics_multiple as $keys){
-                            foreach($keys as $key){
-                                foreach($key as $attributes){
-                                    foreach($attributes as $attribute){
-                                        if(strcmp($attribute["@attributes"]["name"], "topicid")==0){
-                                            if(!in_array($attribute["VALUE"], $subjects[$subject->id]->topics)){
-                                                $subjects[$subject->id]->topics[$attribute["VALUE"]] = new stdClass();
-                                                $subjects[$subject->id]->topics[$attribute["VALUE"]]->id = $attribute["VALUE"];
-                                                $subjects[$subject->id]->topics[$attribute["VALUE"]]->descriptors = array();
-                                                $current_id = $attribute["VALUE"];
+                        
+                        //TODO CreateItem
+                        //kommentar
+                        //weblink
+                        //aufwand
+                        //selbsteinschätzung
+                        
+                    }else{
+                        //get topics
+                        $function = "block_exacomp_get_competencies_for_upload";
+                        $params = new stdClass();
+                        $params->userid = 0;
+                        
+                        $resp_xml = $curl->get($serverurl.$function, $params);
+                       
+                        $xml = simplexml_load_string($resp_xml);
+                        $json = json_encode($xml);
+                        $multiple = json_decode($json,TRUE);
+                       
+                        $subjects = array();
+                        $current_id = 0;
+                        foreach($multiple as $single){
+                            foreach($single as $key){
+                                //foreach($keys as $key){
+                                    foreach($key as $attributes){
+                                        foreach($attributes as $attribute){
+                                            if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
+                                                if(!in_array($attribute["VALUE"], $subjects)){
+                                                    $subjects[$attribute["VALUE"]] = new stdClass();
+                                                    $subjects[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                    $subjects[$attribute["VALUE"]]->topics = array();
+                                                    $current_id = $attribute["VALUE"];
+                                                }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "subjecttitle")==0){
+                                                 if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                     $subjects[$current_id]->title = $attribute["VALUE"];
+                                                 }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "topics")==0){
+                                                if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                     $subjects[$current_id]->topics_multiple = $attribute["MULTIPLE"];
+                                                 }
                                             }
-                                        }else if(strcmp($attribute["@attributes"]["name"], "topictitle")==0){
-                                             if(array_key_exists($current_id, $subjects[$subject->id]->topics) && $current_id>0){
-                                                 $subjects[$subject->id]->topics[$current_id]->title = $attribute["VALUE"];
-                                             }
-                                        }else if(strcmp($attribute["@attributes"]["name"], "descriptors")==0){
-                                            if(array_key_exists($current_id,  $subjects[$subject->id]->topics) && $current_id>0){
-                                                 $subjects[$subject->id]->topics[$current_id]->descriptors_multiple = $attribute["MULTIPLE"];
-                                             }
+                                        }
+                                    }
+                                //}
+                            }
+                        }
+                        
+                        foreach($subjects as $subject){
+                            foreach($subject->topics_multiple as $keys){
+                                foreach($keys as $key){
+                                    foreach($key as $attributes){
+                                        foreach($attributes as $attribute){
+                                            if(strcmp($attribute["@attributes"]["name"], "topicid")==0){
+                                                if(!in_array($attribute["VALUE"], $subjects[$subject->id]->topics)){
+                                                    $subjects[$subject->id]->topics[$attribute["VALUE"]] = new stdClass();
+                                                    $subjects[$subject->id]->topics[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                    $subjects[$subject->id]->topics[$attribute["VALUE"]]->descriptors = array();
+                                                    $current_id = $attribute["VALUE"];
+                                                }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "topictitle")==0){
+                                                 if(array_key_exists($current_id, $subjects[$subject->id]->topics) && $current_id>0){
+                                                     $subjects[$subject->id]->topics[$current_id]->title = $attribute["VALUE"];
+                                                 }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "descriptors")==0){
+                                                if(array_key_exists($current_id,  $subjects[$subject->id]->topics) && $current_id>0){
+                                                     $subjects[$subject->id]->topics[$current_id]->descriptors_multiple = $attribute["MULTIPLE"];
+                                                 }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    
-                    foreach($subjects as $subject){
-                        foreach($subject->topics as $topic){
-                            foreach($topic->descriptors_multiple as $keys){
-                                foreach($keys as $key){
-                                    foreach($key as $attributes){
-                                        foreach($attributes as $attribute){
-                                            if(strcmp($attribute["@attributes"]["name"], "descriptorid")==0){
-                                                if(!in_array($attribute["VALUE"],  $subjects[$subject->id]->topics[$topic->id]->descriptors)){
-                                                    $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]] = new stdClass();
-                                                    $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]]->id = $attribute["VALUE"];
-                                                
-                                                    $current_id = $attribute["VALUE"];
+                        
+                        foreach($subjects as $subject){
+                            foreach($subject->topics as $topic){
+                                foreach($topic->descriptors_multiple as $keys){
+                                    foreach($keys as $key){
+                                        foreach($key as $attributes){
+                                            foreach($attributes as $attribute){
+                                                if(strcmp($attribute["@attributes"]["name"], "descriptorid")==0){
+                                                    if(!in_array($attribute["VALUE"],  $subjects[$subject->id]->topics[$topic->id]->descriptors)){
+                                                        $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]] = new stdClass();
+                                                        $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                    
+                                                        $current_id = $attribute["VALUE"];
+                                                    }
+                                                }else if(strcmp($attribute["@attributes"]["name"], "descriptortitle")==0){
+                                                     if(array_key_exists($current_id, $subjects[$subject->id]->topics[$topic->id]->descriptors) && $current_id>0){
+                                                         $subjects[$subject->id]->topics[$topic->id]->descriptors[$current_id]->title = $attribute["VALUE"];
+                                                     }
                                                 }
-                                            }else if(strcmp($attribute["@attributes"]["name"], "descriptortitle")==0){
-                                                 if(array_key_exists($current_id, $subjects[$subject->id]->topics[$topic->id]->descriptors) && $current_id>0){
-                                                     $subjects[$subject->id]->topics[$topic->id]->descriptors[$current_id]->title = $attribute["VALUE"];
-                                                 }
                                             }
                                         }
                                     }
@@ -132,15 +181,20 @@
                 }
                 ?>
 	
+				<form action="schueler_createexample.php?save=1"; method = "post">
 				<ul data-role="listview" data-inset="true">
 			   
 			    <li>
-			    <label for="text-basic">Name:</label>
-					<input name="text-basic" id="text-basic" value="" type="text">
+			    <label for="name">Name:</label>
+					<input name="name" id="name" value="" type="text">
 			    </li>
 			    <li>
-				    <label for="textarea">Beschreibung:</label>
-					<textarea cols="40" rows="8" name="textarea" id="textarea"></textarea>
+				    <label for="description">Beschreibung:</label>
+					<textarea cols="40" rows="8" name="description" id="description"></textarea>
+			    </li>
+			    <li>
+				    <label for="task">Task:</label>
+					<textarea cols="40" rows="8" name="task" id="task"></textarea>
 			    </li>
 			    <li data-role="list-divider">Lernprodukt</li>
 			    <li>	
@@ -148,21 +202,21 @@
 					<input name="file" id="file" value="" type="file">
 			    </li>
 			    <li>
-			    	<label for="text-basic">Weblink:</label>
-					<input name="text-basic" id="text-basic" value="" type="text">
+			    	<label for="weblink">Weblink:</label>
+					<input name="weblink" id="weblink" value="" type="text">
 			    </li>
 			    <li>
-			    	<label for="text-basic">Aufwand:</label>
-					<input name="text-basic" id="text-basic" value="" type="text">
+			    	<label for="effort">Aufwand:</label>
+					<input name="effort" id="effort" value="" type="text">
 				</li>
 				<li>
-					<label for="textarea">Kommentar:</label>
-					<textarea cols="40" rows="8" name="textarea" id="textarea"></textarea>
+					<label for="comment">Kommentar:</label>
+					<textarea cols="40" rows="8" name="comment" id="comment"></textarea>
 				</li>
 				<li data-role="list-divider">Kompetenz</li>
 				<li>
-					<label for="select-choice-8" class="select">Erreichte Kompetenzen:</label>
-					<select name="select-choice-8" id="select-choice-8" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
+					<label for="comps_select" class="select">Erreichbare Kompetenzen:</label>
+					<select name="comps_select[]" id="comps_select" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
 					    <option>Auswahl:</option>
 					    <?php
 					        foreach($subjects as $subject){
@@ -179,8 +233,8 @@
 				</li>
 				<li data-role="list-divider">Selbsteinsch&auml;tzung</li>
 				 <li>
-					<label for="slider-fill">Selbsteinsch&auml;tzung:</label>
-					<input name="slider-fill" id="slider-fill" value="0" min="0" max="100" step="1" data-highlight="true" type="range">
+					<label for="self_eval">Selbsteinsch&auml;tzung:</label>
+					<input name="self_eval" id="self_eval" value="0" min="0" max="100" step="1" data-highlight="true" type="range">
 				 </li>
 				<li class="ui-body ui-body-b">
 		            <fieldset class="ui-grid-a">
@@ -189,14 +243,6 @@
 		            </fieldset>
 		        </li>
 			</ul>
-			
-				
-
-				
-			
-
-
-
 				
 			</div><!-- /ui-content -->
 			
@@ -212,7 +258,7 @@
 			    </div><!-- /navbar -->
 			</div><!-- /footer -->
 
-	
+	</form>
 		
 	
 	</div><!.. /lovevet -->
