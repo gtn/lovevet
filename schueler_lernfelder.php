@@ -121,11 +121,11 @@
                         foreach($topic->examples as $example){
                             $status = $example->status;
                             if($status == 0)
-                                echo '<li data-icon="eye"><a href="schueler_example.php?exampleid='.$example->id.'&itemid='.$example->item.'">'.$example->title.' (noch offen)</a></li>';
+                                echo '<li data-icon="eye"><a href="schueler_example.php?exampleid='.$example->id.'&itemid='.$example->item.'&courseid='.$courseid.'">'.$example->title.' (noch offen)</a></li>';
                             elseif($status == 1)
-                                echo '<li data-icon="check" class="example-done"><a href="schueler_example.php?exampleid='.$example->id.'&itemid='.$example->item.'">'.$example->title.' (gelöst)</a></li>';
+                                echo '<li data-icon="check" class="example-done"><a href="schueler_example.php?exampleid='.$example->id.'&itemid='.$example->item.'&courseid='.$courseid.'">'.$example->title.' (gelöst)</a></li>';
                             elseif($status == 2)
-                                echo '<li data-icon="alert" class="example-alert"><a href="schueler_example.php?exampleid='.$example->id.'&itemid='.$example->item.'">'.$example->title.' (Abgegeben, Überarbeitung erforderlich)</a></li>';
+                                echo '<li data-icon="alert" class="example-alert"><a href="schueler_example.php?exampleid='.$example->id.'&itemid='.$example->item.'&courseid='.$courseid.'">'.$example->title.' (Abgegeben, Überarbeitung erforderlich)</a></li>';
                         }
                         echo '</ul>';
                         echo '</div>';

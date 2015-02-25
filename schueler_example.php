@@ -39,6 +39,7 @@
                     
                     if(isset($exacomp_token) && isset($_GET['exampleid'])){
                         $example = $_GET['exampleid'];
+                        $courseid = $_GET['courseid'];
                         $curl = new curl;
                         $properties = parse_ini_file("properties.ini");		
                         $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
@@ -112,6 +113,8 @@
                                 $function = "block_exacomp_get_descriptors_for_example";
                                 $params = new stdClass();
                                 $params->exampleid = $example;
+                                $params->courseid = $courseid;
+                                $params->userid = 0;
                                 
                                 $resp_xml = $curl->get($serverurl.$function, $params);
                                 $xml = simplexml_load_string($resp_xml);
@@ -143,7 +146,7 @@
 								$count = count($descriptors);
                                 echo '<li data-role="list-divider">Kompetenzen die diesem Beispiel zugeordnet sind <span class="ui-li-count">'.$count.'</span></li>';
 			                    echo '<li>';
-                                
+			                    
 								if($all)
                                     echo '<input name="checkbox-1aa" id="checkbox-1aa" checked="" type="checkbox" disabled="">';
                                 else 
