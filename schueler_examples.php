@@ -66,6 +66,10 @@
                                               if(array_key_exists($current_id, $subjects) && $current_id>0){
                                                   $subjects[$current_id]->title = $attribute["VALUE"];
                                               }
+                                         }else if(strcmp($attribute["@attributes"]["name"], "courseid")==0){
+                                             if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                  $subjects[$current_id]->courseid = $attribute["VALUE"];
+                                              }
                                          }
                                      }
                                  }
@@ -78,7 +82,7 @@
                 <ul data-role="listview" data-inset="true" data-divider-theme="a">
                 <?php 
                 foreach($subjects as $subject){
-                    echo "<li><a href='schueler_lernfelder.php?subjectid=".$subject->id."'>".$subject->title."</a></li>";
+                    echo "<li><a href='schueler_lernfelder.php?subjectid=".$subject->id."&courseid=".$subject->courseid."'>".$subject->title."</a></li>";
                 }
                 ?>
                 </ul>

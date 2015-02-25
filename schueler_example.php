@@ -34,7 +34,9 @@
                     $exacomp_token = $_SESSION['exacomp_token'];
                     $exaport_token = $_SESSION['exaport_token'];
                     //echo $exacomp_token;
+                    //TODO: 
                     $student_self_evaluation = 0;
+                    
                     if(isset($exacomp_token) && isset($_GET['exampleid'])){
                         $example = $_GET['exampleid'];
                         $curl = new curl;
@@ -53,6 +55,7 @@
                        
                         $title = "";
                         $description = "";
+                        $task = "";
                         foreach($single as $key){
                             foreach($key as $attributes){
                                 foreach($attributes as $attribute){
@@ -60,29 +63,20 @@
                                         $title = $attribute["VALUE"];
                                     else if(strcmp($attribute["@attributes"]["name"], "description") == 0)
                                         $description = $attribute["VALUE"];
-                                    else if(strcmp($attribute["@attributes"]["name"], "studentvalue")==0)
-                                        $student_self_evaluation = $attribute["VALUE"];
+                                    else if(strcmp($attribute["@attributes"]["name"], "task")==0)
+                                        $task = $attribute["VALUE"];
                                 }
                             }
                         }
                         echo '<h2>'.$title.'</h2>';
-                        echo '<p>'.$description.'</p>'; 
+                        echo '<p>'.$description.'</p>';
+                        echo '</li>';
+                        if(!empty($task)){
+                             echo '<li><a href="'.$task.'"><h2>'.$task.'</h2></a></li>';   
+                        }
                     }
 				?>
-			   	</li>
-			   	
-			    <li><a href="#">
-			    <h2>Video.avi</h2>
-			    </a>
-			    </li>
-			    <li><a href="#">
-			    <h2>Bild.jpg</h2>
-			    </a>
-			    </li>
-			    <li><a href="#">
-			    <h2>www.exabis.at</h2>
-			    </a>
-			    </li>
+				
 			    </li>
 			    <li data-role="list-divider">Lernprodukt</li>
 			    <li>	
