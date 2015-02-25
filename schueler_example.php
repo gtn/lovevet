@@ -22,21 +22,22 @@
 				<a class="ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext ui-shadow ui-corner-all" data-rel="back" href="trainer_studentlist.php" data-role="button" role="button">Back</a>
 			
 			</div>
-			
+			<form method="POST" action="schueler_example.php?exampleid=<?php echo $_GET['exampleid']?>&courseid=<?php echo $_GET['courseid']?>">
 			<div class="ui-content" role="main">
 				<ul data-role="listview" data-inset="true">
 			    <li data-role="list-divider">Aufgabe</li>
 			    <li>
 				<?php 
 				    require_once('./curl.php');
+				    $itemid = 0;
+				    if(isset($_GET['itemid']))
+				        $itemid = $_GET['itemid'];
 				    
 				    session_start();
 				    $mdl_token = $_SESSION['mdl_token'];
                     $exacomp_token = $_SESSION['exacomp_token'];
                     $exaport_token = $_SESSION['exaport_token'];
                     //echo $exacomp_token;
-                    //TODO: 
-                    $student_self_evaluation = 0;
                     
                     if(isset($exacomp_token) && isset($_GET['exampleid'])){
                         $example = $_GET['exampleid'];
@@ -96,7 +97,7 @@
                     
                         print_r($xml);
                     }
-                    if(isset($_GET['submitexample'])) {
+                    if(isset($_POST['url'])) {
                         $curl = new curl;
                         $properties = parse_ini_file("properties.ini");
                         
@@ -115,10 +116,30 @@
                         curl_setopt($ch, CURLOPT_POST, true);
                         curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
                         $response = curl_exec($ch);
-                        print_r($response);
+                        
+                        $jsonresponse = json_decode($response);
+                        
+                        $curl = new curl;
+                        $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
+                        //get topics
+                        $function = "block_exacomp_submit_example";
+                        $params = new stdClass();
+                        $params->exampleid = $_GET['exampleid'];
+                        $params->studentvalue = $_POST['studentvalue'];
+                        $params->url = $_POST['url'];
+                        $params->effort = $_POST['effort'];
+                        $params->filename = $jsonresponse[0]->filename;
+                        $params->studentcomment = $_POST['studentcomment'];
+                        $params->title = 'dummytitle';
+                        
+                        $resp_xml = $curl->get($serverurl.$function."&moodlewsrestformat=json", $params);
+                        
+                        $resp = json_decode($resp_xml);
+                        $itemid = $resp->itemid;          
                     }
 				?>
 				
+				<?php if($itemid == 0) { ?>
 			    </li>
 			    <li data-role="list-divider">Lernprodukt</li>
 			    <li>	
@@ -127,22 +148,63 @@
 			    </li>
 			    <li>
 			    	<label for="text-basic">Weblink:</label>
-					<input name="text-basic" id="text-basic" value="" type="text">
+					<input name="url" id="text-basic" value="" type="text">
 			    </li>
 			    <li>
 			    	<label for="text-basic">Aufwand:</label>
-					<input name="text-basic" id="text-basic" value="" type="text">
+					<input name="effort" id="text-basic" value="" type="text">
 				</li>
 				<li>
 					<label for="textarea">Kommentar:</label>
-					<textarea cols="40" rows="8" name="textarea" id="textarea"></textarea>
+					<textarea cols="40" rows="8" name="studentcomment" id="textarea"></textarea>
 				</li>
 				 <li data-role="list-divider">Selbsteinsch&auml;tzung</li>
 				 <li>
 					<label for="slider-fill">Selbsteinsch&auml;tzung:</label>
-					<input name="slider-fill" id="slider-fill" value="<?php echo $student_self_evaluation;?>" min="0" max="100" step="1" data-highlight="true" type="range">
+					<input name="studentvalue" id="slider-fill" value="<?php echo $student_self_evaluation;?>" min="0" max="100" step="1" data-highlight="true" type="range">
 				 </li>
-				
+				<?php } else {
+				        $userid = 0;
+				    
+				        $curl = new curl;
+				        $properties = parse_ini_file("properties.ini");
+				        $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
+				        //get topics
+				        $function = "block_exacomp_get_item_for_example";
+				        $params = new stdClass();
+				        $params->userid = $userid;
+				        $params->itemid = $itemid;
+				    
+				        $resp_xml = $curl->get($serverurl.$function."&moodlewsrestformat=json", $params);
+                        $resp = json_decode($resp_xml);				    
+
+                        print_r($resp);
+				?>
+				</li>
+			    <li data-role="list-divider">Lernprodukt</li>
+			    <li>	
+					<label for="file">File:</label>
+					<input name="file" id="file" value="" type="file">
+					<img src="<?php echo $resp->file;?>" width="70px">
+			    </li>
+			    <li>
+			    	<label for="text-basic">Weblink:</label>
+					<input name="url" id="text-basic" value="<?php echo $resp->url; ?>" type="text">
+			    </li>
+			    <li>
+			    	<label for="text-basic">Aufwand:</label>
+					<input name="effort" id="text-basic" value="<?php echo $resp->effort; ?>" type="text">
+				</li>
+				<li>
+					<label for="textarea">Kommentar:</label>
+					<textarea cols="40" rows="8" name="studentcomment" id="textarea"><?php echo $resp->studentcomment; ?></textarea>
+				</li>
+				 <li data-role="list-divider">Selbsteinsch&auml;tzung</li>
+				 <li>
+					<label for="slider-fill">Selbsteinsch&auml;tzung:</label>
+					<input name="studentvalue" id="slider-fill" min="0" max="100" step="1" data-highlight="true" type="range" value="<?php echo $resp->studentvalue;?>">
+				 </li>
+				<?php } ?>
 					    <?php 
 					        if(isset($exacomp_token) && isset($_GET['exampleid'])){
                                 $example = $_GET['exampleid'];
@@ -225,7 +287,7 @@
 		        </li>
 			</ul>
 	
-				
+			</form>	
 			
 
 
