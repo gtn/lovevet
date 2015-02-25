@@ -4,6 +4,7 @@
 <head>
 	<title>Lovevet</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
 	<link rel="stylesheet" href="css/custom.css" />
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
@@ -24,7 +25,113 @@
 			
 			<div class="ui-content" role="main">
 
-				
+				<?php 
+                require_once('./curl.php');
+                
+                session_start();
+                $exacomp_token = $_SESSION['exacomp_token'];
+                $exaport_token = $_SESSION['exaport_token'];
+                //echo $exacomp_token;
+                if(isset($exacomp_token)){
+                    $curl = new curl;
+                    
+                    $properties = parse_ini_file("properties.ini");		
+                    $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
+                    
+                    //get topics
+                    $function = "block_exacomp_get_competencies_for_upload";
+                    $params = new stdClass();
+                    $params->userid = 0;
+                    
+                    $resp_xml = $curl->get($serverurl.$function, $params);
+                   
+                    $xml = simplexml_load_string($resp_xml);
+                    $json = json_encode($xml);
+                    $multiple = json_decode($json,TRUE);
+                   
+                    $subjects = array();
+                    $current_id = 0;
+                    foreach($multiple as $single){
+                        foreach($single as $key){
+                            //foreach($keys as $key){
+                                foreach($key as $attributes){
+                                    foreach($attributes as $attribute){
+                                        if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
+                                            if(!in_array($attribute["VALUE"], $subjects)){
+                                                $subjects[$attribute["VALUE"]] = new stdClass();
+                                                $subjects[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                $subjects[$attribute["VALUE"]]->topics = array();
+                                                $current_id = $attribute["VALUE"];
+                                            }
+                                        }else if(strcmp($attribute["@attributes"]["name"], "subjecttitle")==0){
+                                             if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                 $subjects[$current_id]->title = $attribute["VALUE"];
+                                             }
+                                        }else if(strcmp($attribute["@attributes"]["name"], "topics")==0){
+                                            if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                 $subjects[$current_id]->topics_multiple = $attribute["MULTIPLE"];
+                                             }
+                                        }
+                                    }
+                                }
+                            //}
+                        }
+                    }
+                    
+                    foreach($subjects as $subject){
+                        foreach($subject->topics_multiple as $keys){
+                            foreach($keys as $key){
+                                foreach($key as $attributes){
+                                    foreach($attributes as $attribute){
+                                        if(strcmp($attribute["@attributes"]["name"], "topicid")==0){
+                                            if(!in_array($attribute["VALUE"], $subjects[$subject->id]->topics)){
+                                                $subjects[$subject->id]->topics[$attribute["VALUE"]] = new stdClass();
+                                                $subjects[$subject->id]->topics[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                $subjects[$subject->id]->topics[$attribute["VALUE"]]->descriptors = array();
+                                                $current_id = $attribute["VALUE"];
+                                            }
+                                        }else if(strcmp($attribute["@attributes"]["name"], "topictitle")==0){
+                                             if(array_key_exists($current_id, $subjects[$subject->id]->topics) && $current_id>0){
+                                                 $subjects[$subject->id]->topics[$current_id]->title = $attribute["VALUE"];
+                                             }
+                                        }else if(strcmp($attribute["@attributes"]["name"], "descriptors")==0){
+                                            if(array_key_exists($current_id,  $subjects[$subject->id]->topics) && $current_id>0){
+                                                 $subjects[$subject->id]->topics[$current_id]->descriptors_multiple = $attribute["MULTIPLE"];
+                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    foreach($subjects as $subject){
+                        foreach($subject->topics as $topic){
+                            foreach($topic->descriptors_multiple as $keys){
+                                foreach($keys as $key){
+                                    foreach($key as $attributes){
+                                        foreach($attributes as $attribute){
+                                            if(strcmp($attribute["@attributes"]["name"], "descriptorid")==0){
+                                                if(!in_array($attribute["VALUE"],  $subjects[$subject->id]->topics[$topic->id]->descriptors)){
+                                                    $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]] = new stdClass();
+                                                    $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                
+                                                    $current_id = $attribute["VALUE"];
+                                                }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "descriptortitle")==0){
+                                                 if(array_key_exists($current_id, $subjects[$subject->id]->topics[$topic->id]->descriptors) && $current_id>0){
+                                                     $subjects[$subject->id]->topics[$topic->id]->descriptors[$current_id]->title = $attribute["VALUE"];
+                                                 }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                ?>
+	
 				<ul data-role="listview" data-inset="true">
 			   
 			    <li>
@@ -57,17 +164,17 @@
 					<label for="select-choice-8" class="select">Erreichte Kompetenzen:</label>
 					<select name="select-choice-8" id="select-choice-8" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
 					    <option>Auswahl:</option>
-					    <optgroup label="Kompetenzbereich 1">
-					        <option value="kompetenz1">Kompetenz 1</option>
-					        <option value="Kompetenz2">Kompetenz 2</option>
-					        <option value="Kompetenz3">Kompetenz  3</option>
-					        <option value="Kompetenz4">Kompetenz 4</option>
-					    </optgroup>
-					    <optgroup label="Kompetenzbereich 2">
-					        <option value="Kompetenz5">Kompetenz 5</option>
-					        <option value="Kompetenz6">Kompetenz 6</option>
-					        <option value="Kompetenz7">Kompetenz 7</option>
-					    </optgroup>
+					    <?php
+					        foreach($subjects as $subject){
+					            foreach($subject->topics as $topic){
+					                echo ' <optgroup label="'.$topic->title.'">';
+					                foreach($topic->descriptors as $descriptor){
+					                    echo '<option value="'.$descriptor->id.'">'.$descriptor->title.'</option>';
+					                }
+					                echo '</optgroup>';
+					            }
+					        }
+					    ?>
 					</select>
 				</li>
 				<li data-role="list-divider">Selbsteinsch&auml;tzung</li>
