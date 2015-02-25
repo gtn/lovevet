@@ -144,29 +144,35 @@
                                 }
 								
 								$count = count($descriptors);
-                                echo '<li data-role="list-divider">Kompetenzen die diesem Beispiel zugeordnet sind <span class="ui-li-count">'.$count.'</span></li>';
-			                    echo '<li>';
-			                    
-								if($all)
-                                    echo '<input name="checkbox-1aa" id="checkbox-1aa" checked="" type="checkbox" disabled="">';
-                                else 
-                                    echo '<input name="checkbox-1aa" id="checkbox-1aa" type="checkbox" disabled="">';
-                                 
-                                echo '<label for="checkbox-1aa">Alle Kompetenzen erreicht</label>';
-                                echo '</li>';
-                                echo '<li>';
-                                echo '<fieldset data-role="controlgroup">';
-                                echo '<legend>Einzelkompetenzen:</legend>';
-                                
-                                foreach($descriptors as $descriptor){
-                                    if($descriptor->evaluation == 0)
-                                        echo '<input name="checkbox-1a" id="checkbox-1a" type="checkbox" disabled="">';
+								
+								if($count > 0){
+                                    echo '<li data-role="list-divider">Kompetenzen die diesem Beispiel zugeordnet sind <span class="ui-li-count">'.$count.'</span></li>';
+    			                    echo '<li>';
+    			                    
+    								if($all)
+                                        echo '<input name="checkbox-1aa" id="checkbox-1aa" checked="" type="checkbox" disabled="">';
                                     else 
-                                        echo '<input name="checkbox-1a" id="checkbox-1a" checked="" type="checkbox" disabled="">';
+                                        echo '<input name="checkbox-1aa" id="checkbox-1aa" type="checkbox" disabled="">';
+                                     
+                                    echo '<label for="checkbox-1aa">Alle Kompetenzen erreicht</label>';
+                                    echo '</li>';
+                                    echo '<li>';
+                                    echo '<fieldset data-role="controlgroup">';
+                                    echo '<legend>Einzelkompetenzen:</legend>';
                                     
-                                    echo '<label for="checkbox-1a">'.$descriptor->title.'</label>';
-                                }
-                                echo '</fieldset>';
+                                    foreach($descriptors as $descriptor){
+                                        if($descriptor->evaluation == 0)
+                                            echo '<input name="checkbox-1a" id="checkbox-1a" type="checkbox" disabled="">';
+                                        else 
+                                            echo '<input name="checkbox-1a" id="checkbox-1a" checked="" type="checkbox" disabled="">';
+                                        
+                                        echo '<label for="checkbox-1a">'.$descriptor->title.'</label>';
+                                    }
+                                    echo '</fieldset>';
+								}
+								else{
+								     echo '<li data-role="list-divider">Diesem Beispiel sind keine Kompetenzen zugeordnet.</li>';
+								}
                             }
 					    ?>
 		        </li>
