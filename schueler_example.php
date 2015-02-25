@@ -31,6 +31,7 @@
 				    require_once('./curl.php');
 				    
 				    session_start();
+				    $mdl_token = $_SESSION['mdl_token'];
                     $exacomp_token = $_SESSION['exacomp_token'];
                     $exaport_token = $_SESSION['exaport_token'];
                     //echo $exacomp_token;
@@ -75,6 +76,46 @@
                         if(!empty($task)){
                              echo '<li><a href="'.$task.'"><h2>'.$task.'</h2></a></li>';   
                         }
+                    }
+                    if(isset($_GET['itemid']) && isset($_GET['userid'])) {
+                        $example = $_GET['itemid'];
+                        $userid = $_GET['userid'];
+                    
+                        $curl = new curl;
+                        $properties = parse_ini_file("properties.ini");
+                        $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
+                        //get topics
+                        $function = "block_exacomp_get_item_for_example";
+                        echo $serverurl.$function;
+                        $params = new stdClass();
+                        $params->userid = $userid;
+                        $params->itemid = $itemid;
+                    
+                        $resp_xml = $curl->get($serverurl.$function, $params);
+                        $xml = simplexml_load_string($resp_xml);
+                    
+                        print_r($xml);
+                    }
+                    if(isset($_GET['submitexample'])) {
+                        $curl = new curl;
+                        $properties = parse_ini_file("properties.ini");
+                        
+                        /// UPLOAD PARAMETERS
+                        //Note: check "Maximum uploaded file size" in your Moodle "Site Policies".
+                        $imagepath = './image_to_upload.jpg';
+                        $filepath = '/'; //put the file to the root of your private file area. //OPTIONAL
+                        /// UPLOAD IMAGE - Moodle 2.1 and later
+                        $params = array('file_box' => "@".$imagepath,'filepath' => $filepath, 'token' => $mdl_token);
+                        $ch = curl_init();
+                        curl_setopt($ch, CURLOPT_HEADER, 0);
+                        curl_setopt($ch, CURLOPT_VERBOSE, 0);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible;)");
+                        curl_setopt($ch, CURLOPT_URL, $properties["url"] . 'webservice/upload.php');
+                        curl_setopt($ch, CURLOPT_POST, true);
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+                        $response = curl_exec($ch);
+                        print_r($response);
                     }
 				?>
 				
