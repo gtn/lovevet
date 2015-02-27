@@ -25,10 +25,6 @@
 			
 			<div class="ui-content" role="main">
 
-	
-
-
-	
 			<ul data-role="listview" data-inset="true">
 			    <li data-role="list-divider">Aufgabe</li>
 			    <li>
@@ -84,11 +80,49 @@
                     }
                     
                     //TODO item auslesen und anzeigen
+                    $itemid = $_GET['itemid'];
+                    $userid = $_GET['userid'];
+                    
+                    if($itemid > 0) {
+                        $curl = new curl;
+                        $properties = parse_ini_file("properties.ini");
+                        $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
+                        
+                        //get topics
+                        $function = "block_exacomp_get_item_for_example";
+                        $params = new stdClass();
+                        $params->itemid = $itemid;
+                        $params->userid = $userid;
+                        
+                        $resp_xml = $curl->get($serverurl.$function.'&moodlewsrestformat=json', $params);
+                        $item = json_decode($resp_xml,TRUE);
+                    }
 				?>
+				<li data-role="list-divider">Lernprodukt</li>
 				
+				<li>
+				    <h2>File:</h2>
+				    <p><?php echo $item['filename']; ?> </p>
+				</li>
+				<li>
+				    <h2>Link:</h2>
+				    <p><?php echo $item['url']; ?> </p>
+				</li>
+				<li>
+				    <h2>Aufwand:</h2>
+				    <p><?php echo $item['effort']; ?> </p>
+				</li>
+				<li>
+				    <h2>Aufwand:</h2>
+				    <p><?php echo $item['effort']; ?> </p>
+				</li>
+				<li>
+					<h2>Schülereinschätzung:</h2>
+					<input disabled name="slider-fill" id="slider-fill" value="<?php echo $item['studentvalue'];?>" min="0" max="100" step="1" data-highlight="true" type="range">
+				 </li>
 			    <li>
 				    <h2>Kommentar:</h2>
-				    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. </p>
+				    <p><?php echo $item['studentcomment']; ?></p>
 				</li>
 			    <li data-role="list-divider">Beispiel gel&ouml;st</li>
 			    <li>
