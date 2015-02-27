@@ -24,7 +24,8 @@
 			</div>
 			
 			<div class="ui-content" role="main">
-
+            <form method="POST" action="trainer_example.php?exampleid=<?php echo $_GET['exampleid']?>&courseid=<?php echo $_GET['courseid']?>&userid=<?php echo $_GET['userid']?>&itemid=<?php echo $_GET['itemid']?>">
+			
 			<ul data-role="listview" data-inset="true">
 			    <li data-role="list-divider">Aufgabe</li>
 			    <li>
@@ -78,7 +79,23 @@
                              echo '<li><a href="'.$task.'"><h2>'.$task.'</h2></a></li>';   
                         }
                     }
+                    if(!empty($_POST)) {
+                        //GRADE ITEM
+                        
+                        $curl = new curl;
+                        $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
+                        //get topics
+                        $function = "block_exacomp_grade_item";
+                        $params = new stdClass();
+                        $params->userid = $_GET['exampleid'];
+                        $params->value = $_POST['teachervalue'];
+                        $params->comment = $_POST['teachercomment'];
+                        $params->itemid = $_GET['itemid'];
+                        $params->courseid = $_GET['courseid'];
+                        $params->comps = "";
                     
+                        $resp_xml = $curl->get($serverurl.$function."&moodlewsrestformat=json", $params);
+                    }
                     //TODO item auslesen und anzeigen
                     $itemid = $_GET['itemid'];
                     $userid = $_GET['userid'];
@@ -87,48 +104,49 @@
                         $curl = new curl;
                         $properties = parse_ini_file("properties.ini");
                         $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
-                        
+                    
                         //get topics
                         $function = "block_exacomp_get_item_for_example";
                         $params = new stdClass();
                         $params->itemid = $itemid;
                         $params->userid = $userid;
-                        
+                    
                         $resp_xml = $curl->get($serverurl.$function.'&moodlewsrestformat=json', $params);
                         $item = json_decode($resp_xml,TRUE);
                     }
-				?>
-				<li data-role="list-divider">Lernprodukt</li>
-				
-				<li>
-				    <h2>File:</h2>
-				    <p><?php echo $item['filename']; ?> </p>
-				</li>
-				<li>
-				    <h2>Link:</h2>
-				    <p><?php echo $item['url']; ?> </p>
-				</li>
-				<li>
-				    <h2>Aufwand:</h2>
-				    <p><?php echo $item['effort']; ?> </p>
-				</li>
-				<li>
-					<h2>Schülereinschätzung:</h2>
-					<input disabled name="slider-fill" id="slider-fill" value="<?php echo $item['studentvalue'];?>" min="0" max="100" step="1" data-highlight="true" type="range">
-				 </li>
-			    <li>
-				    <h2>Kommentar:</h2>
-				    <p><?php echo $item['studentcomment']; ?></p>
-				</li>
-			    <li data-role="list-divider">Beispiel gel&ouml;st</li>
-			    <li>
-					<label for="slider-fill">Beispiel gel&ouml;st:</label>
-					<input name="slider-fill" id="slider-fill" value="0" min="0" max="100" step="1" data-highlight="true" type="range">
-				 </li>
-			    <li>
-			    	<label for="textarea">Kommentar:</label>
-					<textarea cols="40" rows="8" name="textarea" id="textarea"></textarea>
-			    </li>
+                    ?>
+                    				<li data-role="list-divider">Lernprodukt</li>
+                    				
+                    				<li>
+                    				    <h2>File:</h2>
+                    				    <p><?php echo $item['filename']; ?> </p>
+                    				</li>
+                    				<li>
+                    				    <h2>Link:</h2>
+                    				    <p><?php echo $item['url']; ?> </p>
+                    				</li>
+                    				<li>
+                    				    <h2>Aufwand:</h2>
+                    				    <p><?php echo $item['effort']; ?> </p>
+                    				</li>
+                    				<li>
+                    					<h2>Schülereinschätzung:</h2>
+                    					<input disabled name="slider-fill" id="slider-fill" value="<?php echo $item['studentvalue'];?>" min="0" max="100" step="1" data-highlight="true" type="range">
+                    				 </li>
+                    			    <li>
+                    				    <h2>Kommentar:</h2>
+                    				    <p><?php echo $item['studentcomment']; ?></p>
+                    				</li>
+                    			    <li data-role="list-divider">Beispiel gel&ouml;st</li>
+                    			    <li>
+                    					<label for="slider-fill">Beispiel gel&ouml;st:</label>
+                    					<input name="teachervalue" id="slider-fill" value="<?php echo $item['teachervalue'];?>" min="0" max="100" step="1" data-highlight="true" type="range">
+                    				 </li>
+                    			    <li>
+                    			    	<label for="textarea">Kommentar:</label>
+                    					<textarea cols="40" rows="8" name="teachercomment" id="textarea"><?php echo $item['teachercomment'];?></textarea>
+                    			    </li>
+                    			    </form>
 			     <?php 
 					        if(isset($exacomp_token) && isset($_GET['exampleid'])){
                                 $example = $_GET['exampleid'];
