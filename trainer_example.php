@@ -36,6 +36,7 @@
 				    session_start();
                     $exacomp_token = $_SESSION['exacomp_token'];
                     $exaport_token = $_SESSION['exaport_token'];
+                    $mdl_token = $_SESSION['mdl_token'];
                     //echo $exacomp_token;
                     //TODO: 
                     $student_self_evaluation = 0;
@@ -121,6 +122,8 @@
                     				<li>
                     				    <h2>File:</h2>
                     				    <p><?php echo $item['filename']; ?> </p>
+                    				    <img src="<?php echo $item['file'].'&token='.$mdl_token;?>" width="70px">
+                    				    
                     				</li>
                     				<li>
                     				    <h2>Link:</h2>
