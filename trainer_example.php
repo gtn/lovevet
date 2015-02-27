@@ -136,7 +136,7 @@
 			     <?php 
 					        if(isset($exacomp_token) && isset($_GET['exampleid'])){
                                 $example = $_GET['exampleid'];
-                                $userid = $_GET['u'];
+                                $userid = $_GET['userid'];
                                 $curl = new curl;
                                 $properties = parse_ini_file("properties.ini");		
                                 $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
@@ -156,24 +156,42 @@
                                 $descriptors = array();
                                 $all = true;
                                 $current_id = 0;
-                                //TODO mehrere deskriptoren zu einem beispiel
                                 foreach($multiple as $single){
-                                    foreach($single as $key){
-                                        foreach($key as $attributes){
-                                            foreach($attributes as $attribute){
-                                                if(strcmp($attribute["@attributes"]["name"], "descriptorid")==0){
-                                                    $descriptors[$attribute["VALUE"]] = new stdClass();
-                                                    $current_id = $attribute["VALUE"];
-                                                }else if(strcmp($attribute["@attributes"]["name"], "title") == 0)
-                                                    $descriptors[$current_id]->title = $attribute["VALUE"];
-                                                else if(strcmp($attribute["@attributes"]["name"], "evaluation")==0){
-                                                    $descriptors[$current_id]->evaluation = $attribute["VALUE"];
-                                                    if($attribute["VALUE"]==0) $all = false;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+									foreach($single as $keys){
+										foreach($keys as $key=>$value){
+											//different results from webservice
+											if(strcmp($key, "KEY")==0){
+												foreach($value as $attribute){
+													if(strcmp($attribute["@attributes"]["name"], "descriptorid")==0){
+														$descriptors[$attribute["VALUE"]] = new stdClass();
+														$descriptors[$attribute["VALUE"]]->id = $attribute["VALUE"];
+														$current_id = $attribute["VALUE"];
+													}else if(strcmp($attribute["@attributes"]["name"], "title") == 0)
+													$descriptors[$current_id]->title = $attribute["VALUE"];
+													else if(strcmp($attribute["@attributes"]["name"], "evaluation")==0){
+														$descriptors[$current_id]->evaluation = $attribute["VALUE"];
+														if($attribute["VALUE"]==0) $all = false;
+													}
+												}
+											}else{
+												foreach($value as $attributes){
+													foreach($attributes as $attribute){
+														if(strcmp($attribute["@attributes"]["name"], "descriptorid")==0){
+															$descriptors[$attribute["VALUE"]] = new stdClass();
+															$descriptors[$attribute["VALUE"]]->id = $attribute["VALUE"];
+															$current_id = $attribute["VALUE"];
+														}else if(strcmp($attribute["@attributes"]["name"], "title") == 0)
+														$descriptors[$current_id]->title = $attribute["VALUE"];
+														else if(strcmp($attribute["@attributes"]["name"], "evaluation")==0){
+															$descriptors[$current_id]->evaluation = $attribute["VALUE"];
+															if($attribute["VALUE"]==0) $all = false;
+														}
+													}
+												}
+											}
+										}
+									}
+								}
 								
 								$count = count($descriptors);
 								
@@ -193,13 +211,13 @@
                                     echo '<legend>Einzelkompetenzen:</legend>';
                                     
                                     foreach($descriptors as $descriptor){
-                                        if($descriptor->evaluation == 0)
-                                            echo '<input name="checkbox-1a" id="checkbox-1a" type="checkbox">';
-                                        else 
-                                            echo '<input name="checkbox-1a" id="checkbox-1a" checked="" type="checkbox">';
-                                        
-                                        echo '<label for="checkbox-1a">'.$descriptor->title.'</label>';
-                                    }
+										if($descriptor->evaluation == 0)
+										echo '<input name="checkbox'.$descriptor->id.'" id="checkbox'.$descriptor->id.'" type="checkbox">';
+										else
+										echo '<input name="checkbox'.$descriptor->id.'" id="checkbox'.$descriptor->id.'" checked="" type="checkbox">';
+
+										echo '<label for="checkbox'.$descriptor->id.'">'.$descriptor->title.'</label>';
+									}
                                     echo '</fieldset>';
 								}
 								else{
