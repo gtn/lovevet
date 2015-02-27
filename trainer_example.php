@@ -81,7 +81,7 @@
                     }
                     if(!empty($_POST)) {
                         //GRADE ITEM
-                        
+                      
                         $curl = new curl;
                         $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
                         //get topics
@@ -93,6 +93,7 @@
                         $params->itemid = $_GET['itemid'];
                         $params->courseid = $_GET['courseid'];
                         $params->comps = "";
+						$params->comps_unset = "";
                     
                         $resp_xml = $curl->get($serverurl.$function."&moodlewsrestformat=json", $params);
                     }
@@ -146,7 +147,7 @@
                     			    	<label for="textarea">Kommentar:</label>
                     					<textarea cols="40" rows="8" name="teachercomment" id="textarea"><?php echo $item['teachercomment'];?></textarea>
                     			    </li>
-                    			    </form>
+                    			   
 			     <?php 
 					        if(isset($exacomp_token) && isset($_GET['exampleid'])){
                                 $example = $_GET['exampleid'];
@@ -248,7 +249,7 @@
 		        
 			</ul>
 			
-
+ </form>
 				
 				
 
