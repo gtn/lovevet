@@ -113,10 +113,6 @@
 				    <p><?php echo $item['effort']; ?> </p>
 				</li>
 				<li>
-				    <h2>Aufwand:</h2>
-				    <p><?php echo $item['effort']; ?> </p>
-				</li>
-				<li>
 					<h2>Schülereinschätzung:</h2>
 					<input disabled name="slider-fill" id="slider-fill" value="<?php echo $item['studentvalue'];?>" min="0" max="100" step="1" data-highlight="true" type="range">
 				 </li>
