@@ -177,15 +177,13 @@
 				    
 				        $resp_xml = $curl->get($serverurl.$function."&moodlewsrestformat=json", $params);
                         $resp = json_decode($resp_xml);				    
-
-                        print_r($resp);
 				?>
 				</li>
 			    <li data-role="list-divider">Lernprodukt</li>
 			    <li>	
 					<label for="file">File:</label>
 					<input name="file" id="file" value="" type="file">
-					<img src="<?php echo $resp->file;?>" width="70px">
+					<img src="<?php echo $resp->file.'&token='.$mdl_token;?>" width="70px">
 			    </li>
 			    <li>
 			    	<label for="text-basic">Weblink:</label>
