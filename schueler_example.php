@@ -101,6 +101,7 @@
                         $title = "";
                         $description = "";
                         $task = "";
+						$externaltask = "";
                         foreach($single as $key){
                             foreach($key as $attributes){
                                 foreach($attributes as $attribute){
@@ -110,6 +111,8 @@
                                         $description = $attribute["VALUE"];
                                     else if(strcmp($attribute["@attributes"]["name"], "task")==0)
                                         $task = $attribute["VALUE"];
+									else if(strcmp($attribute["@attributes"]["name"], "externaltask"==0))
+										$externaltask = $attribute["VALUE"];
                                 }
                             }
                         }
@@ -118,6 +121,9 @@
                         echo '</li>';
                         if(!empty($task)){
                              echo '<li><a href="'.$task.'"><h2>'.$task.'</h2></a></li>';   
+                        }
+						if(!empty($externaltask)){
+                             echo '<li><a href="'.$externaltask.'"><h2>'.$externaltask.'</h2></a></li>';   
                         }
                     }
                     
