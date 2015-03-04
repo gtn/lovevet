@@ -97,8 +97,9 @@ session_start();
 		<div class="ui-footer ui-bar-a ui-footer-fixed slideup" data-theme="a" data-position="fixed" data-role="footer" role="contentinfo">
 			    <div data-role="navbar">
 			        <ul>
-			            <li><a class="ui-btn-active ui-state-persist ui-link ui-btn" href="trainer_student.php">Sch&uuml;ler</a></li>
-			            <li><a class="ui-link ui-btn" href="trainer_createexample.php">Firmen interne Beispiele</a></li>
+			            <li><a class="ui-btn-active ui-state-persist ui-link ui-btn" href="trainer_studentlist.php">Sch&uuml;lerauswahl</a></li>
+			            <li><a class="ui-link ui-btn" href="trainer_ownexamples.php">Beitr&auml;ge</a></li>
+			            <li><a class="ui-link ui-btn" href="trainer_settings.php">Einstellungen</a></li>
 			        </ul>
 			    </div><!-- /navbar -->
 			</div><!-- /footer -->

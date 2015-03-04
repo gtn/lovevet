@@ -116,15 +116,15 @@
                     foreach($topics as $topic){
                         echo '<div data-role="collapsible">';
                         echo '<h2>'.$topic->title.'</h2>';
-                        echo '<ul data-role="listview" data-filter="true">';
+                        echo '<ul data-role="listview">';
                         
                         foreach($topic->examples as $example){
                             $status = $example->status;
-							if($status == -1)
+                            if($status == -1)
                                 echo '<li data-icon="eye"><a href="schueler_example.php?exampleid='.$example->id.'&itemid='.$example->item.'&courseid='.$courseid.'">'.$example->title.' (noch offen)</a></li>';
                             elseif($status == 0)
-                                echo '<li data-icon="eye"><a href="schueler_example.php?exampleid='.$example->id.'&itemid='.$example->item.'&courseid='.$courseid.'">'.$example->title.' (noch offen)</a></li>';
-                            elseif($status == 2)
+								echo '<li data-icon="eye"><a href="schueler_example.php?exampleid='.$example->id.'&itemid='.$example->item.'&courseid='.$courseid.'">'.$example->title.' (warte auf Bewertung)</a></li>';
+							elseif($status == 2)
                                 echo '<li data-icon="check" class="example-done"><a href="schueler_example.php?exampleid='.$example->id.'&itemid='.$example->item.'&courseid='.$courseid.'">'.$example->title.' (gelöst)</a></li>';
                             elseif($status == 1)
                                 echo '<li data-icon="alert" class="example-alert"><a href="schueler_example.php?exampleid='.$example->id.'&itemid='.$example->item.'&courseid='.$courseid.'">'.$example->title.' (Abgegeben, Überarbeitung erforderlich)</a></li>';
@@ -134,7 +134,7 @@
                     }
                 }
                 ?>
-				
+				<a href="schueler_createexample.php" class="ui-shadow ui-btn ui-corner-all">Eigener Beitrag</a>
 			</div><!-- /ui-content -->
 			
 		</div><!-- /ui-panel-wrapper -->
@@ -144,7 +144,7 @@
 			        <ul>
 			            <li><a class="ui-btn-active ui-state-persist  ui-link ui-btn" href="schueler_examples.php">Teilgebiete</a></li>
 			            <li><a class="ui-link ui-btn" href="schueler_compprofile.php">Kompetenzprofil</a></li>
-			            <li><a class="ui-link ui-btn" href="schueler_timeline.php">Timeline</a></li>
+			            <li><a class="ui-link ui-btn" href="schueler_settings.php">Einstellungen</a></li>
 			        </ul>
 			    </div><!-- /navbar -->
 			</div><!-- /footer -->

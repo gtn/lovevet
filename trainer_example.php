@@ -266,7 +266,7 @@
 			        <ul>
 			            <li><a class="ui-btn-active ui-state-persist ui-link ui-btn" href="trainer_teilbereich.php">Teilgebiet</a></li>
 			            <li><a class="ui-link ui-btn" href="trainer_compprofile.php">Kompetenzprofil</a></li>
-			            <li><a class="ui-link ui-btn" href="trainer_report.php">Berichtsheft</a></li>
+			             <li><a class="ui-link ui-btn" href="trainer_settings.php">Einstellungen</a></li>
 			        </ul>
 			    </div><!-- /navbar -->
 			</div><!-- /footer -->

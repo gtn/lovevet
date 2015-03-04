@@ -120,7 +120,7 @@
                         echo '<h2>'.$topic->title.'</h2>';
                         echo '<ul data-role="listview" data-filter="true">';
                         
-                         foreach($topic->examples as $example){
+                        foreach($topic->examples as $example){
                             $status = $example->status;
 							if($status == 0)
 								echo '<li data-icon="eye"><a href="trainer_example.php?userid='.$userid.'&exampleid='.$example->id.'&itemid='.$example->item.'&courseid='.$courseid.'">'.$example->title.' (wartet auf Bewertung)</a></li>';
@@ -164,7 +164,7 @@
 			        <ul>
 			            <li><a class="ui-btn-active ui-state-persist ui-link ui-btn" href="trainer_teilbereich.php">Teilgebiet</a></li>
 			            <li><a class="ui-link ui-btn" href="trainer_compprofile.php">Kompetenzprofil</a></li>
-			            <li><a class="ui-link ui-btn" href="trainer_report.php">Berichtsheft</a></li>
+			            <li><a class="ui-link ui-btn" href="trainer_settings.php">Einstellungen</a></li>
 			        </ul>
 			    </div><!-- /navbar -->
 			</div><!-- /footer -->

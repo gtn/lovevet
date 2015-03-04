@@ -87,7 +87,7 @@
                 ?>
                 </ul>
 
-				<a href="schueler_createexample.php" class="ui-shadow ui-btn ui-corner-all">Eigener Beitrag</a>
+	
 				
 				
 				
@@ -100,7 +100,7 @@
 			        <ul>
 			            <li><a class="ui-btn-active ui-state-persist  ui-link ui-btn" href="schueler_examples.php">Teilgebiete</a></li>
 			            <li><a class="ui-link ui-btn" href="schueler_compprofile.php">Kompetenzprofil</a></li>
-			            <li><a class="ui-link ui-btn" href="schueler_timeline.php">Timeline</a></li>
+			            <li><a class="ui-link ui-btn" href="schueler_settings.php">Einstellungen</a></li>
 			        </ul>
 			    </div><!-- /navbar -->
 			</div><!-- /footer -->

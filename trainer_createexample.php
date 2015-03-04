@@ -18,7 +18,7 @@
 		
 		
 			<div class="ui-header ui-bar-inherit" data-role="header" role="banner">
-				<h1 class="ui-title" role="heading" aria-level="1">Firmeninternes Beispiel</h1>
+				<h1 class="ui-title" role="heading" aria-level="1">Eigener Beitrag</h1>
 				<a class="ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext ui-shadow ui-corner-all" data-rel="back" href="trainer_studentlist.php" data-role="button" role="button">Back</a>
 				
 			</div>
@@ -83,8 +83,9 @@
 		<div class="ui-footer ui-bar-a ui-footer-fixed slideup" data-theme="a" data-position="fixed" data-role="footer" role="contentinfo">
 			    <div data-role="navbar">
 			        <ul>
-			            <li><a class="ui-link ui-btn" href="trainer_student.php">Sch&uuml;ler</a></li>
-			            <li><a class="ui-btn-active ui-state-persist ui-link ui-btn" href="trainer_createexample.php">Firmen interne Beispiele</a></li>
+			            <li><a class="ui-link ui-btn" href="trainer_student.php">Sch&uuml;lerauswahl</a></li>
+			            <li><a class="ui-btn-active ui-state-persist ui-link ui-btn" href="trainer_ownexamples.php">Eigene Beitr&auml;ge</a></li>
+			            <li><a class="ui-link ui-btn" href="trainer_settings.php">Einstellungen</a></li>
 			        </ul>
 			    </div><!-- /navbar -->
 			</div><!-- /footer -->
