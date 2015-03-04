@@ -104,9 +104,6 @@
                             $params->comps = "";
                         }
                         
-                        (isset($_POST['all_comps']) && $_POST['all_comps']==1)?$all_comps = 1:$all_comps = 0;
-                        
-						$params->all_comps = $all_comps;
                         $params->courseid = $_GET['courseid'];
                         $resp_xml = $curl->get($serverurl.$function."&moodlewsrestformat=json", $params);
                     }
