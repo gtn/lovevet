@@ -82,23 +82,35 @@
                     }
                     if(!empty($_POST)) {
                         //GRADE ITEM
-                      
                         $curl = new curl;
                         $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
                         //get topics
                         $function = "block_exacomp_grade_item";
                         $params = new stdClass();
-                        $params->userid = $_GET['exampleid'];
+                        $params->userid = $_GET['userid'];
                         $params->value = $_POST['teachervalue'];
                         $params->comment = $_POST['teachercomment'];
                         $params->itemid = $_GET['itemid'];
+                        if(isset($_POST['descriptors'])){
+                            $comps_array = $_POST['descriptors'];
+                            $comps = "";
+                            foreach($comps_array as $id){
+                                $comps .= $id.",";
+                            }
+                            $comps = substr($comps, 0, strlen($comps)-1);
+                            $params->comps = $comps;
+                        }
+                        else{
+                            $params->comps = "";
+                        }
+                        
+                        (isset($_POST['all_comps']) && $_POST['all_comps']==1)?$all_comps = 1:$all_comps = 0;
+                        
+						$params->all_comps = $all_comps;
                         $params->courseid = $_GET['courseid'];
-                        $params->comps = "";
-						$params->comps_unset = "";
-                    
                         $resp_xml = $curl->get($serverurl.$function."&moodlewsrestformat=json", $params);
                     }
-                    //TODO item auslesen und anzeigen
+                    
                     $itemid = $_GET['itemid'];
                     $userid = $_GET['userid'];
                     
@@ -218,9 +230,9 @@
     			                    echo '<li>';
     			                    
     								if($all)
-                                        echo '<input name="checkbox-1aa" id="checkbox-1aa" checked="" type="checkbox">';
+                                        echo '<input name="all_comps" value="1" id="checkbox-1aa" checked="" type="checkbox">';
                                     else 
-                                        echo '<input name="checkbox-1aa" id="checkbox-1aa" type="checkbox">';
+                                        echo '<input name="all_comps" value="1" id="checkbox-1aa" type="checkbox">';
                                      
                                     echo '<label for="checkbox-1aa">Alle Kompetenzen erreicht</label>';
                                     echo '</li>';
@@ -230,9 +242,9 @@
                                     
                                     foreach($descriptors as $descriptor){
 										if($descriptor->evaluation == 0)
-										echo '<input name="checkbox'.$descriptor->id.'" id="checkbox'.$descriptor->id.'" type="checkbox">';
+										echo '<input name="descriptors[]" value="'.$descriptor->id.'" id="checkbox'.$descriptor->id.'" type="checkbox">';
 										else
-										echo '<input name="checkbox'.$descriptor->id.'" id="checkbox'.$descriptor->id.'" checked="" type="checkbox">';
+										echo '<input name="descriptors[]" value="'.$descriptor->id.'" id="checkbox'.$descriptor->id.'" checked="" type="checkbox">';
 
 										echo '<label for="checkbox'.$descriptor->id.'">'.$descriptor->title.'</label>';
 									}
