@@ -115,7 +115,7 @@
                     }else{
 					
 						if(isset($_GET['exampleid'])){
-						var_dump("inhere");
+						
 							//TODO get example
 							$exampleid = $_GET['exampleid'];
 							$function = "block_exacomp_get_example_by_id";
