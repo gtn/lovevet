@@ -78,25 +78,7 @@
                              echo '<li><a href="'.$task.'"><h2>'.$task.'</h2></a></li>';   
                         }
                     }
-                    if(isset($_GET['itemid']) && isset($_GET['userid'])) {
-                        $example = $_GET['itemid'];
-                        $userid = $_GET['userid'];
                     
-                        $curl = new curl;
-                        $properties = parse_ini_file("properties.ini");
-                        $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
-                        //get topics
-                        $function = "block_exacomp_get_item_for_example";
-                        echo $serverurl.$function;
-                        $params = new stdClass();
-                        $params->userid = $userid;
-                        $params->itemid = $itemid;
-                    
-                        $resp_xml = $curl->get($serverurl.$function, $params);
-                        $xml = simplexml_load_string($resp_xml);
-                    
-                        print_r($xml);
-                    }
                     if(isset($_POST['url'])) {
                         $curl = new curl;
                         $properties = parse_ini_file("properties.ini");
@@ -197,12 +179,29 @@
 					<label for="textarea">Kommentar:</label>
 					<textarea cols="40" rows="8" name="studentcomment" id="textarea"><?php echo $resp->studentcomment; ?></textarea>
 				</li>
+				<li>
+					<label for="textarea">Status:</label>
+					<input disabled name="effort" id="text-basic" value="<?php 
+					if($resp->status == 0) echo "Noch offen";
+					elseif($resp->status == 1) echo "Abgegeben, Überarbeitung erfolderlich";
+					elseif($resp->status == 2) echo "Gelöst"; ?>" type="text">
+				</li>
 				 <li data-role="list-divider">Selbsteinsch&auml;tzung</li>
 				 <li>
 					<label for="slider-fill">Selbsteinsch&auml;tzung:</label>
 					<input name="studentvalue" id="slider-fill" min="0" max="100" step="1" data-highlight="true" type="range" value="<?php echo $resp->studentvalue;?>">
 				 </li>
-				<?php } ?>
+				 <?php if($resp->status > 0) {?>
+				 <li data-role="list-divider">Lehrerbeurteilung</li>
+				 <li>
+					<label for="slider-fill">Lehrereinsch&auml;tzung:</label>
+					<input name="studentvalue" id="slider-fill" min="0" max="100" step="1" data-highlight="true" type="range" value="<?php echo $resp->teachervalue;?>">
+				 </li>
+				 <li>
+					<label for="slider-fill">Lehrerkommentar:</label>
+					<textarea cols="40" rows="8" name="studentcomment" id="textarea"><?php echo $resp->teachercomment; ?></textarea>
+				 </li>
+				<?php } } ?>
 					    <?php 
 					        if(isset($exacomp_token) && isset($_GET['exampleid'])){
                                 $example = $_GET['exampleid'];
