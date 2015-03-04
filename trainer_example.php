@@ -9,6 +9,7 @@
 	<link rel="stylesheet" href="css/custom.css" />
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+   
 </head>
 
 <body>
@@ -226,12 +227,25 @@
                                     echo '<li data-role="list-divider">Kompetenzen die diesem Beispiel zugeordnet sind <span class="ui-li-count">'.$count.'</span></li>';
     			                    echo '<li>';
     			                    
+    			                    ?>
+
+                                    <script type="text/javascript">
+                                    $(document).ready(function() {
+                                        $('#check-all').click(function(){
+                                          $(".label_for_checkbox").addClass('ui-checkbox-on');
+                                          $(".descr_cb").prop('checked', true);
+                                          $(".descr_cb").prop('data-cachecal', false);
+                                        });
+                                      });
+                                     </script>
+    			                    <?php 
+    			                   
     								if($all)
-                                        echo '<input name="all_comps" value="1" id="checkbox-1aa" checked="" type="checkbox">';
+                                        echo '<input name="all_comps" id="check-all" onClick="check-all()" "checked="" type="checkbox">';
                                     else 
-                                        echo '<input name="all_comps" value="1" id="checkbox-1aa" type="checkbox">';
+                                        echo '<input name="all_comps" id="check-all" onClick="javascript:void(0);" type="checkbox">';
                                      
-                                    echo '<label for="checkbox-1aa">Alle Kompetenzen erreicht</label>';
+                                    echo '<label for="check-all">Alle Kompetenzen erreicht</label>';
                                     echo '</li>';
                                     echo '<li>';
                                     echo '<fieldset data-role="controlgroup">';
@@ -239,11 +253,11 @@
                                     
                                     foreach($descriptors as $descriptor){
 										if($descriptor->evaluation == 0)
-										echo '<input name="descriptors[]" value="'.$descriptor->id.'" id="checkbox'.$descriptor->id.'" type="checkbox">';
+										echo '<input class="descr_cb" name="descriptors[]" value="'.$descriptor->id.'" id="checkbox'.$descriptor->id.'" type="checkbox">';
 										else
-										echo '<input name="descriptors[]" value="'.$descriptor->id.'" id="checkbox'.$descriptor->id.'" checked="" type="checkbox">';
+										echo '<input class="descr_cb" name="descriptors[]" value="'.$descriptor->id.'" id="checkbox'.$descriptor->id.'" checked="" type="checkbox">';
 
-										echo '<label for="checkbox'.$descriptor->id.'">'.$descriptor->title.'</label>';
+										echo '<label class="label_for_checkbox" for="checkbox'.$descriptor->id.'">'.$descriptor->title.'</label>';
 									}
                                     echo '</fieldset>';
 								}
