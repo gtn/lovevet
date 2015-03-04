@@ -31,6 +31,8 @@
 				    <li><a href="trainer_createexample.php">Eigener Beitrag 2</a></li>
 				    <li><a href="trainer_createexample.php">Eigener Beitrag 3</a></li>
 				</ul> 
+				
+				<a href="trainer_createexample.php" class="ui-shadow ui-btn ui-corner-all">Neuen Beitrag erstellen</a>
 
 			</div><!-- /ui-content -->
 			
