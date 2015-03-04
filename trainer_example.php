@@ -92,6 +92,7 @@
                         $params->value = $_POST['teachervalue'];
                         $params->comment = $_POST['teachercomment'];
                         $params->itemid = $_GET['itemid'];
+                        $params->status = (isset($_POST['status'])) ? 2 : 1;
                         if(isset($_POST['descriptors'])){
                             $comps_array = $_POST['descriptors'];
                             $comps = "";
@@ -153,7 +154,8 @@
                     				</li>
                     			    <li data-role="list-divider">Beispiel gel&ouml;st</li>
                     			    <li>
-                    					<label for="slider-fill">Beispiel gel&ouml;st:</label>
+                    					<label for="flip-checkbox">Beispiel gel&ouml;st:</label>
+                                        <input type="checkbox" data-role="flipswitch" name="status" id="flip-checkbox" data-on-text="Ja" data-off-text="Nein" data-wrapper-class="custom-label-flipswitch" <?php if($item['status'] == 2) echo "checked";?>>
                     					<input name="teachervalue" id="slider-fill" value="<?php echo $item['teachervalue'];?>" min="0" max="100" step="1" data-highlight="true" type="range">
                     				 </li>
                     			    <li>
