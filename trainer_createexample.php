@@ -4,6 +4,7 @@
 <head>
 	<title>Lovevet</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
 	<link rel="stylesheet" href="css/custom.css" />
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
@@ -25,44 +26,256 @@
 		
 			<div class="ui-content" role="main">
 				
+				<?php 
+                require_once('./curl.php');
+                
+                session_start();
+                $exacomp_token = $_SESSION['exacomp_token'];
+                $exaport_token = $_SESSION['exaport_token'];
+                $mdl_token=$_SESSION['mdl_token'];
+				
+				$example_title = "";
+				$example_description = "";
+				$example_task = "";
+				$example_externaltask = "";
+                //echo $exacomp_token;
+                if(isset($exacomp_token)){
+                    (isset($_GET['save'])&& $_GET['save']==1)?$save=1:$save=0;
+                    $curl = new curl;
+                        
+                    $properties = parse_ini_file("properties.ini");		
+                    $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
+                        
+                    if($save == 1){
+                        
+                        //name, description & competencies for example
+                        if(isset($_POST['name']) && isset($_POST['description']) && isset($_POST['comps_select'])){
+                            /// UPLOAD PARAMETERS
+                            //Note: check "Maximum uploaded file size" in your Moodle "Site Policies".
+                            $imagepath = './exabislogo2.jpg';
+                            $filepath = '/'; //put the file to the root of your private file area. //OPTIONAL
+                            /// UPLOAD IMAGE - Moodle 2.1 and later
+                            $params = array('file_box' => "@".$imagepath,'filepath' => $filepath, 'token' => $mdl_token);
+                            $ch = curl_init();
+                            curl_setopt($ch, CURLOPT_HEADER, 0);
+                            curl_setopt($ch, CURLOPT_VERBOSE, 0);
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                            curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible;)");
+                            curl_setopt($ch, CURLOPT_URL, $properties["url"] . 'webservice/upload.php');
+                            curl_setopt($ch, CURLOPT_POST, true);
+                            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+                            $response = curl_exec($ch);
+                            
+                            $jsonresponse = json_decode($response);
+                            
+                            $name = $_POST['name'];
+                            $description = $_POST['description'];
+                            $comps_array = $_POST['comps_select'];
+                            $task = $_POST['task'];
+                            
+                            $comps = "";
+                            foreach($comps_array as $id){
+                                $comps .= $id.",";
+                            }
+                            $comps = substr($comps, 0, strlen($comps)-1);
+                            
+                            $function = "block_exacomp_create_example";
+                            $params = new stdClass();
+                            $params->name = $name;
+                            $params->description = $description;
+                            $params->task = $task;
+                            $params->comps = $comps;
+                            $params->filename = $jsonresponse[0]->filename;
+
+                            $resp_xml = $curl->get($serverurl.$function, $params);
+                            $xml = simplexml_load_string($resp_xml);
+                            $json = json_encode($xml);
+                            $single = json_decode($json,TRUE);
+                            var_dump($resp_xml);
+                            foreach($single as $key){
+                                foreach($key as $attribute){
+                                   if(strcmp($attribute["@attributes"]["name"], "exampleid")==0){
+                                        $id = $attribute["VALUE"];
+                                    }
+                                }
+                            }
+                           
+                            //example wurde erstellt, auf example seite weiterleiten?
+                            echo '<script type="text/javascript">
+           							window.location = "trainer_createexample.php?exampleid='.$id.'";
+      							  </script>';
+                        }
+                        
+                        //TODO CreateItem
+                        //kommentar
+                        //weblink
+                        //aufwand
+                        //selbsteinschätzung
+                        
+                    }else{
+					
+						if(isset($_GET['exampleid'])){
+						var_dump("inhere");
+							//TODO get example
+							$exampleid = $_GET['exampleid'];
+							$function = "block_exacomp_get_example_by_id";
+							$params = new stdClass();
+							$params->exampleid = $exampleid;
+							
+							$resp_xml = $curl->get($serverurl.$function, $params);
+							$xml = simplexml_load_string($resp_xml);
+							$json = json_encode($xml);
+							$single = json_decode($json,TRUE);
+						   
+							foreach($single as $key){
+								foreach($key as $attributes){
+									foreach($attributes as $attribute){
+										if(strcmp($attribute["@attributes"]["name"], "title")==0)
+											$example_title = $attribute["VALUE"];
+										else if(strcmp($attribute["@attributes"]["name"], "description") == 0)
+											$example_description = $attribute["VALUE"];
+										else if(strcmp($attribute["@attributes"]["name"], "task")==0)
+											$example_task = $attribute["VALUE"];
+										else if(strcmp($attribute["@attributes"]["name"], "externaltask")==0)
+											$example_externaltask = $attribute["VALUE"];
+									}
+								}
+							}
+							
+						}
+                        //get topics
+                        $function = "block_exacomp_get_competencies_for_upload";
+                        $params = new stdClass();
+                        $params->userid = 0;
+                        
+                        $resp_xml = $curl->get($serverurl.$function, $params);
+                       
+                        $xml = simplexml_load_string($resp_xml);
+                        $json = json_encode($xml);
+                        $multiple = json_decode($json,TRUE);
+                       
+                        $subjects = array();
+                        $current_id = 0;
+                        foreach($multiple as $single){
+                            foreach($single as $key){
+                                //foreach($keys as $key){
+                                    foreach($key as $attributes){
+                                        foreach($attributes as $attribute){
+                                            if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
+                                                if(!in_array($attribute["VALUE"], $subjects)){
+                                                    $subjects[$attribute["VALUE"]] = new stdClass();
+                                                    $subjects[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                    $subjects[$attribute["VALUE"]]->topics = array();
+                                                    $current_id = $attribute["VALUE"];
+                                                }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "subjecttitle")==0){
+                                                 if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                     $subjects[$current_id]->title = $attribute["VALUE"];
+                                                 }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "topics")==0){
+                                                if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                     $subjects[$current_id]->topics_multiple = $attribute["MULTIPLE"];
+                                                 }
+                                            }
+                                        }
+                                    }
+                                //}
+                            }
+                        }
+                        
+                        foreach($subjects as $subject){
+                            foreach($subject->topics_multiple as $keys){
+                                foreach($keys as $key){
+                                    foreach($key as $attributes){
+                                        foreach($attributes as $attribute){
+                                            if(strcmp($attribute["@attributes"]["name"], "topicid")==0){
+                                                if(!in_array($attribute["VALUE"], $subjects[$subject->id]->topics)){
+                                                    $subjects[$subject->id]->topics[$attribute["VALUE"]] = new stdClass();
+                                                    $subjects[$subject->id]->topics[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                    $subjects[$subject->id]->topics[$attribute["VALUE"]]->descriptors = array();
+                                                    $current_id = $attribute["VALUE"];
+                                                }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "topictitle")==0){
+                                                 if(array_key_exists($current_id, $subjects[$subject->id]->topics) && $current_id>0){
+                                                     $subjects[$subject->id]->topics[$current_id]->title = $attribute["VALUE"];
+                                                 }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "descriptors")==0){
+                                                if(array_key_exists($current_id,  $subjects[$subject->id]->topics) && $current_id>0){
+                                                     $subjects[$subject->id]->topics[$current_id]->descriptors_multiple = $attribute["MULTIPLE"];
+                                                 }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        foreach($subjects as $subject){
+                            foreach($subject->topics as $topic){
+                                foreach($topic->descriptors_multiple as $keys){
+                                    foreach($keys as $key){
+                                        foreach($key as $attributes){
+                                            foreach($attributes as $attribute){
+                                                if(strcmp($attribute["@attributes"]["name"], "descriptorid")==0){
+                                                    if(!in_array($attribute["VALUE"],  $subjects[$subject->id]->topics[$topic->id]->descriptors)){
+                                                        $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]] = new stdClass();
+                                                        $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                    
+                                                        $current_id = $attribute["VALUE"];
+                                                    }
+                                                }else if(strcmp($attribute["@attributes"]["name"], "descriptortitle")==0){
+                                                     if(array_key_exists($current_id, $subjects[$subject->id]->topics[$topic->id]->descriptors) && $current_id>0){
+                                                         $subjects[$subject->id]->topics[$topic->id]->descriptors[$current_id]->title = $attribute["VALUE"];
+                                                     }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                ?>
 				
 				
-				
+				<form action="trainer_createexample.php?save=1"; method = "post">
 				
 				<ul data-role="listview" data-inset="true">
 			    <li data-role="list-divider">Aufgabe</li>
 			    <li>
-			    	<label for="text-basic">Name:</label>
-					<input name="text-basic" id="text-basic" value="" type="text">
+			    	<label for="name">Name:</label>
+					<input name="name" id="text-basic" value="<?php echo $example_title; ?>" type="text">
 			    </li>
 			    <li>
-					<label for="textarea">Beschreibung:</label>
-					<textarea cols="40" rows="8" name="textarea" id="textarea"></textarea>
+					<label for="description">Beschreibung:</label>
+					<textarea cols="40" rows="8" name="description" id="textarea"><?php echo $example_description; ?></textarea>
 				</li>
 			    <li>	
 					<label for="file">File:</label>
-					<input name="file" id="file" value="" type="file">
+					<input name="file" id="file" value="<?php echo $example_task;?>" type="file">
+					<img src="<?php echo $example_task?>" width="70px">
 			    </li>
 			    <li>
-			    	<label for="text-basic">Weblink:</label>
-					<input name="text-basic" id="text-basic" value="" type="text">
+			    	<label for="task">Weblink:</label>
+					<input name="task" id="text-basic" value="<?php echo $example_externaltask;?>" type="text">
 			    </li>
 			    <li data-role="list-divider">Kompetenzen<span class="ui-li-count">3</span></li>
 			    <li>
-					<label for="select-choice-8" class="select">Zugeordnete Kompetenzen:</label>
-					<select name="select-choice-8" id="select-choice-8" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
+					<label for="comps_select" class="select">Zugeordnete Kompetenzen:</label>
+					<select name="comps_select[]" id="comps_select" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
 					    <option>Auswahl:</option>
-					    <optgroup label="Kompetenzbereich 1">
-					        <option value="kompetenz1">Kompetenz 1</option>
-					        <option value="Kompetenz2">Kompetenz 2</option>
-					        <option value="Kompetenz3">Kompetenz  3</option>
-					        <option value="Kompetenz4">Kompetenz 4</option>
-					    </optgroup>
-					    <optgroup label="Kompetenzbereich 2">
-					        <option value="Kompetenz5">Kompetenz 5</option>
-					        <option value="Kompetenz6">Kompetenz 6</option>
-					        <option value="Kompetenz7">Kompetenz 7</option>
-					    </optgroup>
+					    <?php
+					        foreach($subjects as $subject){
+					            foreach($subject->topics as $topic){
+					                echo ' <optgroup label="'.$topic->title.'">';
+					                foreach($topic->descriptors as $descriptor){
+					                    echo '<option value="'.$descriptor->id.'">'.$descriptor->title.'</option>';
+					                }
+					                echo '</optgroup>';
+					            }
+					        }
+					    ?>
 					</select>
 				</li>
 				<li class="ui-body ui-body-b">
@@ -78,7 +291,7 @@
 	
 			</div><!-- /ui-content -->
 		</div><!-- /ui-panel-wrapper -->
-		
+		</form>
 		
 		<div class="ui-footer ui-bar-a ui-footer-fixed slideup" data-theme="a" data-position="fixed" data-role="footer" role="contentinfo">
 			    <div data-role="navbar">
