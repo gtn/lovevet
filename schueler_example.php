@@ -122,7 +122,7 @@
                         if(!empty($task)){
                              echo '<li><a href="'.$task.'"><h2>'.$task.'</h2></a></li>';   
                         }
-						if(!empty($externaltask)){
+						if(!empty($externaltask) && !is_array($externaltask)){
                              echo '<li><a href="'.$externaltask.'"><h2>'.$externaltask.'</h2></a></li>';   
                         }
                     }
