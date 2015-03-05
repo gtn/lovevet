@@ -62,7 +62,9 @@
         								    }
                                          }else if(strcmp($attribute["@attributes"]["name"], "exampletitle")==0){
         								        $examples[$current_id]->title = $attribute["VALUE"];
-        								 }
+        								 }else if(strcmp($attribute["@attributes"]["name"], "example_status")==0){
+												$examples[$current_id]->status = $attribute["VALUE"];
+										 }
 									}
 						         }else{
 									foreach($value as $attributes){
@@ -75,7 +77,9 @@
             								    }
                                              }else if(strcmp($attribute["@attributes"]["name"], "exampletitle")==0){
             								        $examples[$current_id]->title = $attribute["VALUE"];
-            								 }
+            								 }else if(strcmp($attribute["@attributes"]["name"], "example_status")==0){
+												$examples[$current_id]->status = $attribute["VALUE"];
+											 }
 										}
 									}
 						         }
@@ -85,7 +89,7 @@
 					
 					echo '<ul data-role="listview" data-inset="true" data-divider-theme="a">';
 					foreach($examples as $example){
-					    echo '<li><a href="schueler_updateexample.php?exampleid='.$example->id.'">'.$example->title.'</a></li>';
+					    echo '<li><a href="schueler_updateexample.php?exampleid='.$example->id.'&status='.$example->status.'">'.$example->title.'</a></li>';
 					}
 					echo '</ul>';
 				}
