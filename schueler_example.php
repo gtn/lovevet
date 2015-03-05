@@ -126,8 +126,6 @@
                              echo '<li><a href="'.$externaltask.'"><h2>'.$externaltask.'</h2></a></li>';   
                         }
                     }
-                    
-                    
 				?>
 				
 				<?php if($itemid == 0) { ?>

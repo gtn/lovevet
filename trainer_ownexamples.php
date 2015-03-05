@@ -24,14 +24,57 @@
 			
 			<div class="ui-content" role="main">
 
-
-              
-				<ul data-role="listview" data-inset="true" data-divider-theme="a">
-				    <li><a href="trainer_createexample.php">Eigener Beitrag 1</a></li>
-				    <li><a href="trainer_createexample.php">Eigener Beitrag 2</a></li>
-				    <li><a href="trainer_createexample.php">Eigener Beitrag 3</a></li>
-				</ul> 
+			<?php
+				//TODO get own examples
+				require_once('./curl.php');
 				
+				session_start();
+				$mdl_token = $_SESSION['mdl_token'];
+				$exacomp_token = $_SESSION['exacomp_token'];
+				$exaport_token = $_SESSION['exaport_token'];
+				
+				if(isset($exacomp_token)){
+					$curl = new curl;
+					$properties = parse_ini_file("properties.ini");		
+					$serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
+					
+					//get topics
+					$function = "block_exacomp_get_user_examples";
+					
+					$resp_xml = $curl->get($serverurl.$function);
+					$xml = simplexml_load_string($resp_xml);
+					$json = json_encode($xml);
+					$multiple = json_decode($json,TRUE);
+					
+					$examples = array();
+					$current_id = 0;
+					foreach($multiple as $single){
+                         foreach($single as $keys){
+                                 foreach($keys as $key){
+                                     foreach($key as $attributes){
+                                         foreach($attributes as $attribute){
+                                             if(strcmp($attribute["@attributes"]["name"], "exampleid")==0){
+											    if(!array_key_exists($attribute["VALUE"], $examples)){
+											        $examples[$attribute["VALUE"]] = new stdClass();
+											        $examples[$attribute["VALUE"]]->id = $attribute["VALUE"];
+											        $current_id = $attribute["VALUE"];
+											    }
+                                             }else if(strcmp($attribute["@attributes"]["name"], "exampletitle")==0){
+											        $examples[$current_id]->title = $attribute["VALUE"];
+											 }
+                                         }
+									 }
+							     }
+						 }
+					}
+					
+					echo '<ul data-role="listview" data-inset="true" data-divider-theme="a">';
+					foreach($examples as $example){
+					    echo '<li><a href="trainer_createexample.php?exampleid='.$example->id.'">'.$example->title.'</a></li>';
+					}
+					echo '</ul>';
+				}
+			?>
 				<a href="trainer_createexample.php" class="ui-shadow ui-btn ui-corner-all">Neuen Beitrag erstellen</a>
 
 			</div><!-- /ui-content -->
