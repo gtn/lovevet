@@ -58,9 +58,10 @@
                     $current_id = 0;
                     foreach($multiple as $single){
                         foreach($single as $keys){
-                            foreach($keys as $key){
-                                foreach($key as $attributes){
-                                    foreach($attributes as $attribute){
+                            foreach($keys as $key=>$value){
+											//different results from webservice
+								if(strcmp($key, "KEY")==0){
+								    foreach($value as $attribute){
                                         if(strcmp($attribute["@attributes"]["name"], "topicid")==0){
                                             if(!in_array($attribute["VALUE"], $topics)){
                                                 $topics[$attribute["VALUE"]] = new stdClass();
@@ -78,10 +79,32 @@
                                              }
                                         }
                                     }
-                                }
+                                }else{
+									foreach($value as $attributes){
+										foreach($attributes as $attribute){
+											if(strcmp($attribute["@attributes"]["name"], "topicid")==0){
+												if(!in_array($attribute["VALUE"], $topics)){
+													$topics[$attribute["VALUE"]] = new stdClass();
+													$topics[$attribute["VALUE"]]->id = $attribute["VALUE"];
+													$topics[$attribute["VALUE"]]->examples = array();
+													$current_id = $attribute["VALUE"];
+												}
+											}else if(strcmp($attribute["@attributes"]["name"], "title")==0){
+												 if(array_key_exists($current_id, $topics) && $current_id>0){
+													 $topics[$current_id]->title = $attribute["VALUE"];
+												 }
+											}else if(strcmp($attribute["@attributes"]["name"], "examples")==0){
+												if(array_key_exists($current_id, $topics) && $current_id>0){
+													 $topics[$current_id]->examples_multiple = $attribute["MULTIPLE"];
+												 }
+											}
+										}
+									}
+								}
                             }
                         }
                     }
+                    
                     
                     foreach($topics as $topic){
                         foreach($topic->examples_multiple as $keys){
