@@ -33,7 +33,7 @@
                 if(isset($exacomp_token)){
                     $curl = new curl;
                     //header('Content-Type: text/plain');
-                    
+                   
                     $properties = parse_ini_file("properties.ini");		
                     
                     //get topics
@@ -48,14 +48,16 @@
                     $xml = simplexml_load_string($resp_xml);
                     $json = json_encode($xml);
                     $multiple = json_decode($json, TRUE);
-                    
+
                     $subjects = array();
                     $current_id = 0;
                     foreach($multiple as $single){
                          foreach($single as $keys){
-                             //foreach($keys as $key){
-                                 foreach($keys as $attributes){
-                                     foreach($attributes as $attribute){
+                             foreach($keys as $key=>$value){
+											//different results from webservice
+								if(strcmp($key, "KEY")==0){
+								    foreach($value as $attribute){
+								       
                                          if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
                                              if(!array_key_exists($attribute["VALUE"], $subjects)){
                                                  $subjects[$attribute["VALUE"]] = new stdClass();
@@ -73,7 +75,28 @@
                                          }
                                      }
                                  }
-                            //}
+                                 else{
+                                     foreach($value as $attributes){
+										foreach($attributes as $attribute){
+										 if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
+                                             if(!array_key_exists($attribute["VALUE"], $subjects)){
+                                                 $subjects[$attribute["VALUE"]] = new stdClass();
+                                                 $subjects[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                 $current_id = $attribute["VALUE"];
+                                             }
+                                         }else if(strcmp($attribute["@attributes"]["name"], "title")==0){
+                                              if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                  $subjects[$current_id]->title = $attribute["VALUE"];
+                                              }
+                                         }else if(strcmp($attribute["@attributes"]["name"], "courseid")==0){
+                                             if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                  $subjects[$current_id]->courseid = $attribute["VALUE"];
+                                              }
+                                         }
+										}
+                                     }
+                                 }
+                            }
                          }
                      }
                     

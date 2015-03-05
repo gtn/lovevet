@@ -50,27 +50,42 @@
 					$current_id = 0;
 					foreach($multiple as $single){
                          foreach($single as $keys){
-                                 foreach($keys as $key){
-                                     foreach($key as $attributes){
-                                         foreach($attributes as $attribute){
-                                             if(strcmp($attribute["@attributes"]["name"], "exampleid")==0){
-											    if(!array_key_exists($attribute["VALUE"], $examples)){
-											        $examples[$attribute["VALUE"]] = new stdClass();
-											        $examples[$attribute["VALUE"]]->id = $attribute["VALUE"];
-											        $current_id = $attribute["VALUE"];
-											    }
+                             foreach($keys as $key=>$value){
+								//different results from webservice
+								if(strcmp($key, "KEY")==0){
+									foreach($value as $attribute){
+                                         if(strcmp($attribute["@attributes"]["name"], "exampleid")==0){
+        								    if(!array_key_exists($attribute["VALUE"], $examples)){
+        								        $examples[$attribute["VALUE"]] = new stdClass();
+        								        $examples[$attribute["VALUE"]]->id = $attribute["VALUE"];
+        								        $current_id = $attribute["VALUE"];
+        								    }
+                                         }else if(strcmp($attribute["@attributes"]["name"], "exampletitle")==0){
+        								        $examples[$current_id]->title = $attribute["VALUE"];
+        								 }
+									}
+						         }else{
+									foreach($value as $attributes){
+										foreach($attributes as $attribute){
+    										if(strcmp($attribute["@attributes"]["name"], "exampleid")==0){
+            								    if(!array_key_exists($attribute["VALUE"], $examples)){
+            								        $examples[$attribute["VALUE"]] = new stdClass();
+            								        $examples[$attribute["VALUE"]]->id = $attribute["VALUE"];
+            								        $current_id = $attribute["VALUE"];
+            								    }
                                              }else if(strcmp($attribute["@attributes"]["name"], "exampletitle")==0){
-											        $examples[$current_id]->title = $attribute["VALUE"];
-											 }
-                                         }
-									 }
-							     }
+            								        $examples[$current_id]->title = $attribute["VALUE"];
+            								 }
+										}
+									}
+						         }
+    					     }
 						 }
 					}
 					
 					echo '<ul data-role="listview" data-inset="true" data-divider-theme="a">';
 					foreach($examples as $example){
-					    echo '<li><a href="trainer_createexample.php?exampleid='.$example->id.'">'.$example->title.'</a></li>';
+					    echo '<li><a href="trainer_updateexample.php?exampleid='.$example->id.'">'.$example->title.'</a></li>';
 					}
 					echo '</ul>';
 				}
