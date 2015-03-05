@@ -50,23 +50,6 @@
                     if($save == 1){
                         //name, description & competencies for example
                         if(isset($_POST['name']) && isset($_POST['description'])){
-                            /// UPLOAD PARAMETERS
-                            //Note: check "Maximum uploaded file size" in your Moodle "Site Policies".
-                            $imagepath = './exabislogo2.jpg';
-                            $filepath = '/'; //put the file to the root of your private file area. //OPTIONAL
-                            /// UPLOAD IMAGE - Moodle 2.1 and later
-                            $params = array('file_box' => "@".$imagepath,'filepath' => $filepath, 'token' => $mdl_token);
-                            $ch = curl_init();
-                            curl_setopt($ch, CURLOPT_HEADER, 0);
-                            curl_setopt($ch, CURLOPT_VERBOSE, 0);
-                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                            curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible;)");
-                            curl_setopt($ch, CURLOPT_URL, $properties["url"] . 'webservice/upload.php');
-                            curl_setopt($ch, CURLOPT_POST, true);
-                            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-                            $response = curl_exec($ch);
-                            
-                            $jsonresponse = json_decode($response);
                             
                             $name = $_POST['name'];
                             $description = $_POST['description'];
@@ -89,7 +72,7 @@
                             $params->description = $description;
                             $params->task = $task;
                             $params->comps = $comps;
-                            $params->filename = $jsonresponse[0]->filename;
+                            $params->filename = null;
 
                             $resp_xml = $curl->get($serverurl.$function, $params);
                             $xml = simplexml_load_string($resp_xml);
@@ -263,7 +246,7 @@
                     
                 }
                 ?>
-				<form action="trainer_updateexample.php?save=1&exampleid=<?php echo $exampleid?>"; method = "post">
+				<form action="schueler_updateexample.php?save=1&exampleid=<?php echo $exampleid?>"; method = "post">
 				
 				<ul data-role="listview" data-inset="true">
 			    <li data-role="list-divider">Aufgabe</li>
@@ -275,11 +258,6 @@
 					<label for="description">Beschreibung:</label>
 					<textarea cols="40" rows="8" name="description" id="textarea"><?php echo $example_description; ?></textarea>
 				</li>
-			    <li>	
-					<label for="file">File:</label>
-					<input name="file" id="file" value="<?php echo $example_externaltask;?>" type="file">
-					<img src="<?php echo $example_externaltask?>" width="70px">
-			    </li>
 			    <li>
 			    	<label for="task">Weblink:</label>
 					<input name="task" id="text-basic" value="<?php echo $example_task;?>" type="text">

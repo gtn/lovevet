@@ -253,12 +253,12 @@
 				</li>
 			    <li>	
 					<label for="file">File:</label>
-					<input name="file" id="file" value="<?php echo $example_task;?>" type="file">
-					<img src="<?php echo $example_task?>" width="70px">
+					<input name="file" id="file" value="<?php echo $example_externaltask;?>" type="file">
+					<img src="<?php echo $example_externaltask?>" width="70px">
 			    </li>
 			    <li>
 			    	<label for="task">Weblink:</label>
-					<input name="task" id="text-basic" value="<?php echo $example_externaltask;?>" type="text">
+					<input name="task" id="text-basic" value="<?php echo $example_task;?>" type="text">
 			    </li>
 			    <li data-role="list-divider">Kompetenzen<span class="ui-li-count">3</span></li>
 			    <li>
