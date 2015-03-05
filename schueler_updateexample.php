@@ -72,9 +72,10 @@
                             $params->description = $description;
                             $params->task = $task;
                             $params->comps = $comps;
-                            $params->filename = null;
+                            $params->filename = 0;
 
                             $resp_xml = $curl->get($serverurl.$function, $params);
+					
                             $xml = simplexml_load_string($resp_xml);
                             $json = json_encode($xml);
                             $single = json_decode($json,TRUE);
