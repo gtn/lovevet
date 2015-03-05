@@ -59,12 +59,13 @@
                             $params->description = $description;
                             $params->task = $task;
                             $params->comps = $comps;
+                            $params->filename = 0;
 
                             $resp_xml = $curl->get($serverurl.$function, $params);
                             $xml = simplexml_load_string($resp_xml);
                             $json = json_encode($xml);
                             $single = json_decode($json,TRUE);
-                            
+                           
                             foreach($single as $key){
                                 foreach($key as $attribute){
                                    if(strcmp($attribute["@attributes"]["name"], "exampleid")==0){
@@ -98,85 +99,127 @@
                         $multiple = json_decode($json,TRUE);
                        
                         $subjects = array();
-                        $current_id = 0;
-                        foreach($multiple as $single){
-                            foreach($single as $key){
-                                //foreach($keys as $key){
-                                    foreach($key as $attributes){
-                                        foreach($attributes as $attribute){
-                                            if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
-                                                if(!in_array($attribute["VALUE"], $subjects)){
-                                                    $subjects[$attribute["VALUE"]] = new stdClass();
-                                                    $subjects[$attribute["VALUE"]]->id = $attribute["VALUE"];
-                                                    $subjects[$attribute["VALUE"]]->topics = array();
-                                                    $current_id = $attribute["VALUE"];
-                                                }
-                                            }else if(strcmp($attribute["@attributes"]["name"], "subjecttitle")==0){
-                                                 if(array_key_exists($current_id, $subjects) && $current_id>0){
-                                                     $subjects[$current_id]->title = $attribute["VALUE"];
-                                                 }
-                                            }else if(strcmp($attribute["@attributes"]["name"], "topics")==0){
-                                                if(array_key_exists($current_id, $subjects) && $current_id>0){
-                                                     $subjects[$current_id]->topics_multiple = $attribute["MULTIPLE"];
-                                                 }
+                    $current_id = 0;
+                    foreach($multiple as $single){
+                        foreach($single as $keys){
+                            foreach($keys as $key=>$value){
+								//different results from webservice
+								if(strcmp($key, "KEY")==0){
+									foreach($value as $attribute){
+                                        if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
+                                            if(!in_array($attribute["VALUE"], $subjects)){
+                                                $subjects[$attribute["VALUE"]] = new stdClass();
+                                                $subjects[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                $subjects[$attribute["VALUE"]]->topics = array();
+                                                $current_id = $attribute["VALUE"];
                                             }
+                                        }else if(strcmp($attribute["@attributes"]["name"], "subjecttitle")==0){
+                                             if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                 $subjects[$current_id]->title = $attribute["VALUE"];
+                                             }
+                                        }else if(strcmp($attribute["@attributes"]["name"], "topics")==0){
+                                            if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                 $subjects[$current_id]->topics_multiple = $attribute["MULTIPLE"];
+                                             }
                                         }
                                     }
-                                //}
+                                }else{
+                                    foreach($value as $attributes){
+										foreach($attributes as $attribute){
+										if(strcmp($attribute["@attributes"]["name"], "subjectid")==0){
+                                            if(!in_array($attribute["VALUE"], $subjects)){
+                                                $subjects[$attribute["VALUE"]] = new stdClass();
+                                                $subjects[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                $subjects[$attribute["VALUE"]]->topics = array();
+                                                $current_id = $attribute["VALUE"];
+                                            }
+                                        }else if(strcmp($attribute["@attributes"]["name"], "subjecttitle")==0){
+                                             if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                 $subjects[$current_id]->title = $attribute["VALUE"];
+                                             }
+                                        }else if(strcmp($attribute["@attributes"]["name"], "topics")==0){
+                                            if(array_key_exists($current_id, $subjects) && $current_id>0){
+                                                 $subjects[$current_id]->topics_multiple = $attribute["MULTIPLE"];
+                                             }
+                                        }
+										}
+                                    }
+                                }
                             }
                         }
-                        
-                        foreach($subjects as $subject){
-                            foreach($subject->topics_multiple as $keys){
-                                foreach($keys as $key){
-                                    foreach($key as $attributes){
-                                        foreach($attributes as $attribute){
-                                            if(strcmp($attribute["@attributes"]["name"], "topicid")==0){
-                                                if(!in_array($attribute["VALUE"], $subjects[$subject->id]->topics)){
-                                                    $subjects[$subject->id]->topics[$attribute["VALUE"]] = new stdClass();
-                                                    $subjects[$subject->id]->topics[$attribute["VALUE"]]->id = $attribute["VALUE"];
-                                                    $subjects[$subject->id]->topics[$attribute["VALUE"]]->descriptors = array();
-                                                    $current_id = $attribute["VALUE"];
-                                                }
-                                            }else if(strcmp($attribute["@attributes"]["name"], "topictitle")==0){
-                                                 if(array_key_exists($current_id, $subjects[$subject->id]->topics) && $current_id>0){
-                                                     $subjects[$subject->id]->topics[$current_id]->title = $attribute["VALUE"];
-                                                 }
-                                            }else if(strcmp($attribute["@attributes"]["name"], "descriptors")==0){
-                                                if(array_key_exists($current_id,  $subjects[$subject->id]->topics) && $current_id>0){
-                                                     $subjects[$subject->id]->topics[$current_id]->descriptors_multiple = $attribute["MULTIPLE"];
-                                                 }
+                    }
+                   
+                    
+                    foreach($subjects as $subject){
+                        foreach($subject->topics_multiple as $keys){
+                            foreach($keys as $key){
+                                foreach($key as $attributes){
+                                    foreach($attributes as $attribute){
+                                        if(strcmp($attribute["@attributes"]["name"], "topicid")==0){
+                                            if(!in_array($attribute["VALUE"], $subjects[$subject->id]->topics)){
+                                                $subjects[$subject->id]->topics[$attribute["VALUE"]] = new stdClass();
+                                                $subjects[$subject->id]->topics[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                $subjects[$subject->id]->topics[$attribute["VALUE"]]->descriptors = array();
+                                                $current_id = $attribute["VALUE"];
                                             }
+                                        }else if(strcmp($attribute["@attributes"]["name"], "topictitle")==0){
+                                             if(array_key_exists($current_id, $subjects[$subject->id]->topics) && $current_id>0){
+                                                 $subjects[$subject->id]->topics[$current_id]->title = $attribute["VALUE"];
+                                             }
+                                        }else if(strcmp($attribute["@attributes"]["name"], "descriptors")==0){
+                                            if(array_key_exists($current_id,  $subjects[$subject->id]->topics) && $current_id>0){
+                                                 $subjects[$subject->id]->topics[$current_id]->descriptors_multiple = $attribute["MULTIPLE"];
+                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                        
-                        foreach($subjects as $subject){
-                            foreach($subject->topics as $topic){
-                                foreach($topic->descriptors_multiple as $keys){
-                                    foreach($keys as $key){
-                                        foreach($key as $attributes){
-                                            foreach($attributes as $attribute){
-                                                if(strcmp($attribute["@attributes"]["name"], "descriptorid")==0){
-                                                    if(!in_array($attribute["VALUE"],  $subjects[$subject->id]->topics[$topic->id]->descriptors)){
-                                                        $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]] = new stdClass();
-                                                        $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]]->id = $attribute["VALUE"];
-                                                    
-                                                        $current_id = $attribute["VALUE"];
-                                                    }
-                                                }else if(strcmp($attribute["@attributes"]["name"], "descriptortitle")==0){
-                                                     if(array_key_exists($current_id, $subjects[$subject->id]->topics[$topic->id]->descriptors) && $current_id>0){
-                                                         $subjects[$subject->id]->topics[$topic->id]->descriptors[$current_id]->title = $attribute["VALUE"];
-                                                     }
+                    }
+                    
+                     foreach($subjects as $subject){
+                        foreach($subject->topics as $topic){
+                            foreach($topic->descriptors_multiple as $keys){
+                                foreach($keys as $key=>$value){
+    								//different results from webservice
+    								if(strcmp($key, "KEY")==0){
+    									foreach($value as $attribute){
+                                            if(strcmp($attribute["@attributes"]["name"], "descriptorid")==0){
+                                                if(!in_array($attribute["VALUE"],  $subjects[$subject->id]->topics[$topic->id]->descriptors)){
+                                                    $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]] = new stdClass();
+                                                    $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                
+                                                    $current_id = $attribute["VALUE"];
                                                 }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "descriptortitle")==0){
+                                                 if(array_key_exists($current_id, $subjects[$subject->id]->topics[$topic->id]->descriptors) && $current_id>0){
+                                                     $subjects[$subject->id]->topics[$topic->id]->descriptors[$current_id]->title = $attribute["VALUE"];
+                                                 }
                                             }
                                         }
+                                    }else{
+                                        foreach($value as $attributes){
+											foreach($attributes as $attribute){
+											if(strcmp($attribute["@attributes"]["name"], "descriptorid")==0){
+                                                if(!in_array($attribute["VALUE"],  $subjects[$subject->id]->topics[$topic->id]->descriptors)){
+                                                    $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]] = new stdClass();
+                                                    $subjects[$subject->id]->topics[$topic->id]->descriptors[$attribute["VALUE"]]->id = $attribute["VALUE"];
+                                                
+                                                    $current_id = $attribute["VALUE"];
+                                                }
+                                            }else if(strcmp($attribute["@attributes"]["name"], "descriptortitle")==0){
+                                                 if(array_key_exists($current_id, $subjects[$subject->id]->topics[$topic->id]->descriptors) && $current_id>0){
+                                                     $subjects[$subject->id]->topics[$topic->id]->descriptors[$current_id]->title = $attribute["VALUE"];
+                                                 }
+                                            }
+											}
+										}
                                     }
                                 }
                             }
                         }
+                    }
+                    
                     }
                 }
                 ?>
