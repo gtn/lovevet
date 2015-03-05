@@ -24,15 +24,40 @@
 		
 			<div class="ui-content" role="main">
 
-	
+				<!-- ><img src="images/comp.jpg" />  -->
+				<?php 
+				require_once('./curl.php');
 
+				session_start();
+				$exacomp_token = $_SESSION['exacomp_token'];
 
-	
-			<img src="images/comp.jpg" />
+				//echo $exacomp_token;
+				if(isset($exacomp_token)){
+				    $curl = new curl;
+				    //header('Content-Type: text/plain');
 
+				    $properties = parse_ini_file("properties.ini");
 
-				
-			</div><!-- /ui-content -->
+				    //get topics
+				    $serverurl = $properties["url"].$properties["webserviceurl"]."?wstoken=".$exacomp_token."&wsfunction=";
+				    $function = "block_exacomp_get_user_profile";
+
+				    $params = new stdClass();
+				    $params->userid = $_GET['u'];
+
+				    $resp = $curl->get($serverurl.$function."&moodlewsrestformat=json", $params);
+
+				    $resp = json_decode($resp);
+				    foreach($resp as $r) {
+				        echo $r->title . ": ";
+				        echo "<progress value='".$r->reachedcomps."' max='".$r->totalcomps."'></progress>";
+				        echo "<br/>";
+				    }
+				}
+				?>
+
+			</div>
+			<!-- /ui-content -->
 			
 		</div><!-- /ui-panel-wrapper -->
 	
