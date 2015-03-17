@@ -44,7 +44,7 @@
                     $exampleid = $_GET['exampleid'];
                     
 					$disabled = "";
-					if($status==0 || $status==-1)
+					if($status>0) //Bewertung vorhanden -> nicht mehr änderbar
 						$disabled = 'disabled=""';
 						
                     $curl = new curl;

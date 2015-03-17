@@ -40,7 +40,12 @@
                 //echo $exacomp_token;
                 if(isset($exacomp_token) && isset($_GET['exampleid'])){
                     (isset($_GET['save'])&& $_GET['save']==1)?$save=1:$save=0;
+                    (isset($_GET['status']))?$status=$_GET['status']:$status=-1;
                     $exampleid = $_GET['exampleid'];
+                    
+                    $disabled = "";
+					if($status>=0) //Abgabe vorhanden -> nicht mehr veränderbar
+						$disabled = 'disabled=""';
                     
                     $curl = new curl;
                         
@@ -269,20 +274,20 @@
 			    <li data-role="list-divider">Aufgabe</li>
 			    <li>
 			    	<label for="name">Name:</label>
-					<input name="name" id="text-basic" value="<?php echo $example_title; ?>" type="text">
+					<input name="name" id="text-basic" <?php echo $disabled; ?> value="<?php echo $example_title; ?>" type="text">
 			    </li>
 			    <li>
 					<label for="description">Beschreibung:</label>
-					<textarea cols="40" rows="8" name="description" id="textarea"><?php echo $example_description; ?></textarea>
+					<textarea cols="40" rows="8" <?php echo $disabled; ?> name="description" id="textarea"><?php echo $example_description; ?></textarea>
 				</li>
 			    <li>	
 					<label for="file">File:</label>
-					<input name="file" id="file" value="<?php echo $example_externaltask;?>" type="file">
+					<input name="file" id="file" <?php echo $disabled; ?> value="<?php echo $example_externaltask;?>" type="file">
 					<img src="<?php echo $example_externaltask?>" width="70px">
 			    </li>
 			    <li>
 			    	<label for="task">Weblink:</label>
-					<input name="task" id="text-basic" value="<?php echo $example_task;?>" type="text">
+					<input name="task" id="text-basic" <?php echo $disabled; ?> value="<?php echo $example_task;?>" type="text">
 			    </li>
 			    <li data-role="list-divider">Kompetenzen<span class="ui-li-count">3</span></li>
 			    <li>
@@ -354,7 +359,7 @@
 					?>
 					
 					
-					<select name="comps_select[]" id="comps_select" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
+					<select name="comps_select[]" <?php echo $disabled; ?> id="comps_select" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
 					    <option>Auswahl:</option>
 					    <?php
 					        foreach($subjects as $subject){
