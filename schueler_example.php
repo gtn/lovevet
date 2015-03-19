@@ -61,9 +61,10 @@
 		    $params->studentcomment = $_POST['studentcomment'];
 		    $params->title = 'dummytitle';
 		    $params->itemid = $itemid;
+		    $params->courseid = $_GET['courseid'];
 		
 		    $resp_xml = $curl->get($serverurl.$function."&moodlewsrestformat=json", $params);
-		
+			print_r($resp_xml);
 		    $resp = json_decode($resp_xml);
 		    $itemid = $resp->itemid;
 		}
