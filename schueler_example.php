@@ -151,7 +151,7 @@
 				 <li data-role="list-divider">Selbsteinsch&auml;tzung</li>
 				 <li>
 					<label for="slider-fill">Selbsteinsch&auml;tzung:</label>
-					<input name="studentvalue" id="slider-fill" value="<?php echo $student_self_evaluation;?>" min="0" max="100" step="1" data-highlight="true" type="range">
+					<input name="studentvalue" id="slider-fill" value="<?php echo 0;?>" min="0" max="100" step="1" data-highlight="true" type="range">
 				 </li>
 				<?php } else {
 				        $userid = 0;
