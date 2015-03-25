@@ -147,6 +147,7 @@
                         $function = "block_exacomp_get_competencies_for_upload";
                         $params = new stdClass();
                         $params->userid = 0;
+						$params->topicid = 0;
                         
                         $resp_xml = $curl->get($serverurl.$function, $params);
                        
